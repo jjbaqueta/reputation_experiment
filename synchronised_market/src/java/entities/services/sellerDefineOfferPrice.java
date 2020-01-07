@@ -8,7 +8,6 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTermImpl;
-import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
 public class sellerDefineOfferPrice extends DefaultInternalAction{
@@ -20,21 +19,26 @@ public class sellerDefineOfferPrice extends DefaultInternalAction{
 	 * An offer is composed by:
 	 * - args[0]: product's name
 	 * - args[1]: computed price (return)
-	 */
-	
+	 */	
 	@Override
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws JasonException 
-	{
+	{	
 		try
-		{
-			//gets the arguments as Terms		
-			StringTerm productName = (StringTerm) args[0];
-			Random r = new Random();
+		{	
+			//Gets the name of product received
+			String productName = args[0].toString();
+
+			//Gets the base price according to the product @see enums.Product
+			double basePrice = Product.valueOf(productName.toUpperCase()).getPrice();
 			
-			double basePrice = Product.valueOf(productName.toString().toUpperCase()).getPrice();
+			/*
+			 * Generates a customized price for each seller
+			 * The price generated may be until 40% bigger than the base price
+			 */
+			Random r = new Random();
 			double price = basePrice + ((basePrice * 1.4) - basePrice) * r.nextDouble();
 						
-			//return the result as Term
+			//Returns the result as Term
 			return un.unifies(new NumberTermImpl(price), args[1]);		
 		}
 		catch(ArrayIndexOutOfBoundsException e)

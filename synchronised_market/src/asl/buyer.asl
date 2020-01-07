@@ -16,7 +16,7 @@ has_offer(false).
 +my_wish(buy, Product)
 	: true
 	<-	.broadcast(askOne, request(Product));
-		.print("finding seller ... (Product: ", Product ,")");
+		.print("finding sellers ... (Product: ", Product ,")");
 		!hangOn.		
 
 +offer(Product, Price)[source(seller)]
