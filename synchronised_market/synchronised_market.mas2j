@@ -1,0 +1,24 @@
+MAS synchronised_market {
+
+	infrastructure: Centralised
+
+	environment: environments.Market
+
+    // synchronise the execution: an agent only
+    // starts its next reasoning cycle when all others
+    // have finished theirs.
+    executionControl: jason.control.ExecutionControl
+
+	agents:
+		
+		//there is one buyer only
+		buyer;
+		
+		//there are 15 seller, 5 for each store
+		store_A	seller.asl [beliefs="sell(tv, smartphone, tablet)"] 	#5;
+		store_B	seller.asl [beliefs="sell(computer, notebook, tablet)"] #5;
+		store_C	seller.asl [beliefs="sell(tv, notebook, tablet)"] 		#5;
+
+	aslSourcePath:
+		"src/asl";
+}
