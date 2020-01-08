@@ -2,9 +2,11 @@ package environments;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import entities.model.Buyer;
+import enums.NegotiationStatus;
 import enums.Product;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
@@ -13,14 +15,14 @@ import jason.environment.Environment;
 
 public class Market extends Environment{
 	
-	private List<Product> products = new ArrayList<Product>();	//list of products that may sold by a seller
-    private Logger logger;  									//simple logger to show log messages
+	private List<Product> products = new ArrayList<Product>();	//List of products that may sold by a seller
+    private Logger logger;  									//Simple logger to show log messages
     
     //Calling model entities
     Buyer buyer = new Buyer();
     
-    //Actions
-    Term end = Literal.parseLiteral("finish(neg)");
+    //Creating an id generator for identify exclusively each product order
+    AtomicInteger seqId = new AtomicInteger();
     
     /** Called before the MAS execution with the args informed in .mas2j */
     
@@ -46,27 +48,33 @@ public class Market extends Environment{
         updatePercepts();
     }
     
-    //this method defines action points which triggers perceptions within environment
+    //This method defines action points which triggers perceptions within environment
     public void updatePercepts()
     {
     	clearPercepts("seller");
     	clearPercepts("buyer");
     	
-    	//if the buyer doesn't have buying at the moment and is open to negotiation, he still can accept new offers by items
-    	if(!buyer.checkNegotiationStatus())
+    	//Defining the initiator for negotiations 
+    	addPercept("buyer", Literal.parseLiteral("!register"));
+    	
+    	//Defining the providers for negotiations 
+    	addPercept("seller", Literal.parseLiteral("!register"));
+    	
+    	//If the buyer is open to negotiation, a new product order is generate
+    	if(buyer.getNegotiationStatus() == NegotiationStatus.OPEN)
     	{
-    		addPercept("buyer", Literal.parseLiteral("my_wish(buy, "+ buyer.whatToBuy(products) +")"));
+    		addPercept("buyer", Literal.parseLiteral("!buy(" + seqId.incrementAndGet() + "," + buyer.whatToBuy(products) +")"));
     	}
     }
 
-    //this method call some specific actions implemented in Java according to some conditions
+    //This method call some specific actions implemented in Java according to some conditions
     @Override
     public boolean executeAction(String agName, Structure action) {
         
     	logger.info("agent: " + agName + " is executing: " + action);
     	
-    	//if the buyer doesn't receive at least one offer at the end of each turn, the simulation ends due to lack of offers
-    	if(action.equals(end))
+    	//The negotiations may finish when the buyer doesn't have more money or when there aren't offers
+    	if(action.equals(Literal.parseLiteral("finish(negotiations)")))
     	{
     		buyer.finishNegotiation();
     	}	

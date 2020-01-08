@@ -3,17 +3,16 @@ package entities.model;
 import java.util.List;
 import java.util.Random;
 
+import enums.NegotiationStatus;
 import enums.Product;
 
 public class Buyer {
 	
-	private boolean buying;		//indicates if buyer is buying at the moment
-	private boolean stopBuying; //if true, indicates that buyer cannot longer to buy
+	private NegotiationStatus negStatus;	//if CLOSE, the buyer cannot longer to buy
 	
 	public Buyer()
 	{
-		buying = false;
-		stopBuying = false;
+		startNegotiation();;
 	}
 	
 	/*
@@ -23,24 +22,27 @@ public class Buyer {
 	 */
 	public String whatToBuy(List<Product> products)
 	{
-		buying = true;
 		Random rand = new Random();
 		return products.get(rand.nextInt(products.size())).name().toLowerCase();
 	}
 	
 	/*
-	 * This method defines the end of the simulation
+	 * This method defines the end of negotiations
 	 */
 	public void finishNegotiation()
 	{
-		this.stopBuying = true;
+		negStatus = NegotiationStatus.CLOSE;
 	}
 	
-	public boolean checkNegotiationStatus() {
-		return stopBuying;
+	/*
+	 * This method defines the begin of negotiations
+	 */
+	public void startNegotiation()
+	{
+		negStatus = NegotiationStatus.OPEN;
 	}
-	
-	public boolean isBuying() {
-		return buying;
-	}
+
+	public NegotiationStatus getNegotiationStatus() {
+		return negStatus;
+	}	
 }
