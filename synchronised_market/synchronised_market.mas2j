@@ -17,9 +17,9 @@ MAS synchronised_market {
 		buyer;
 		
 		//There are 15 seller (who offers a set of product)
-		store_A	seller.asl [beliefs="sell(tv, smartphone, tablet)"] 	#5;
-		store_B	seller.asl [beliefs="sell(computer, notebook, tablet)"] #5;
-		store_C	seller.asl [beliefs="sell(tv, notebook, tablet)"] 		#5;
+		store_A	seller.asl [beliefs="sell(p(tv, Price), p(smartphone, Price), p(tablet, Price))"] 	#5;
+		store_B	seller.asl [beliefs="sell(p(computer, Price), p(notebook, Price), p(tablet, Price))"] #5;
+		store_C	seller.asl [beliefs="sell(p(tv, Price), p(notebook, Price), p(tablet, Price))"] 		#5;
 
 	aslSourcePath:
 		"src/asl";
