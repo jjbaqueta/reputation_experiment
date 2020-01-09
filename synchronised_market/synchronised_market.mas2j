@@ -9,17 +9,21 @@ MAS synchronised_market {
 
 	environment: environments.Market
 
-    executionControl: jason.control.ExecutionControl
-
 	agents:
 		
 		//There is one buyer only - initiator (who need a product)
 		buyer;
 		
 		//There are 15 seller (who offers a set of product)
-		store_A	seller.asl [beliefs="sell(p(tv, Price), p(smartphone, Price), p(tablet, Price))"] 	#5;
-		store_B	seller.asl [beliefs="sell(p(computer, Price), p(notebook, Price), p(tablet, Price))"] #5;
-		store_C	seller.asl [beliefs="sell(p(tv, Price), p(notebook, Price), p(tablet, Price))"] 		#5;
+		
+//		store_A	seller.asl [beliefs="sell([p(tv, Price_tv), p(smartphone, Price_smartphone), p(tablet, Price_tablet)])"]; 
+//		store_A	seller.asl [beliefs="sell([p(tv, 0.0), p(smartphone, 0.0), p(tablet, 0.0)])"]; 
+		store_A	seller.asl;
+		store_b	seller.asl;
+		
+//		store_A	seller.asl [beliefs="sell(p(tv, Price), p(smartphone, Price), p(tablet, Price))"] 	#5;
+//		store_B	seller.asl [beliefs="sell(p(computer, Price), p(notebook, Price), p(tablet, Price))"] #5;
+//		store_C	seller.asl [beliefs="sell(p(tv, Price), p(notebook, Price), p(tablet, Price))"] 		#5;
 
 	aslSourcePath:
 		"src/asl";

@@ -27,7 +27,7 @@ public class sellerDefineOfferPrice extends DefaultInternalAction{
 		{	
 			//Gets the name of product received
 			String productName = args[0].toString();
-
+			
 			//Gets the base price according to the product @see enums.Product
 			double basePrice = Product.valueOf(productName.toUpperCase()).getPrice();
 			

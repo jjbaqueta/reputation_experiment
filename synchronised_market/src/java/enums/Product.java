@@ -1,6 +1,9 @@
 package enums;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /*
  * This enum contains all products and its respectively prices
@@ -40,5 +43,29 @@ public enum Product {
     		System.out.println(p.name().toLowerCase() + "(" + p.getPrice() + ")");
     	}
     	System.out.println("-----------------------------------------");
+    }
+    
+    /*
+     * This method generates from a list of products a subset of products for sale
+     * @param amountOfItems Total the products that will be sold within subset
+     * @param products Existing product list 
+     * @return A set containing all products picked
+     */
+    public static Set<Product> getItemsForSale(int amountOfItems, List<Product> products)
+    {	
+    	if(products.size() > amountOfItems)
+    	{
+    		Set<Product> productsForSell = new LinkedHashSet<Product>();
+	    	
+	    	Random rand = new Random();
+	    	
+	    	while(amountOfItems > 0)
+	    	{
+	    		if(productsForSell.add(products.get(rand.nextInt(products.size()))))
+	    			amountOfItems--;
+	    	}	    		    	
+	    	return productsForSell;
+    	}
+    	else return null;
     }
 }
