@@ -1,104 +1,76 @@
-// gets the price for the product,
-// the price value is defined according to file Product.java in the package 'enums'.
+/* Initial rules ********************************************/
 
-/* Initial rules */
+format_products_on_list(Products) 
+	:-	.findall(p(Name, Price, Quality, Delivery), sell(Name, Price, Quality, Delivery), Products).
 
-/* Initial perceptions */
+find_product_by_name(P_name, Products)
+	:-	.findall(p(P_name, Price, Quality, Delivery), sell(P_name, Price, Quality, Delivery), Products) & 
+		Products \== [].
 
-verbose(true).
-//verbose(false).
+/* Initial perceptions *************************************/
+
+/* Initial goals *******************************************/
 
 !start_activities.
 
-/* Plans */
+/* Plans ***************************************************/
 
 +!start_activities
-//	:	sell(List)
-	<-	//!set_products_prices(List);
-		!print_products.
+	<-	!register.	
 
-//+!set_products_prices([]).
-//
-//+!set_products_prices([H|T])
-//	:	H \== []
-//	<-	!set_price(H);
-//		!set_products_prices(T).
-//		
-//+!set_price(p(Name, Price))
-//	<-	entities.services.sellerDefineOfferPrice(Name, Price).
+// The seller is added on net as a participant.
++!register
+	:	format_products_on_list(Products) 
+	<-	.df_register("participant");
+    	.df_subscribe("initiator");
+    	.print("sell: ", Products).
 
-/******************** Plans for testing **********************/
+// Answering a buying request
+@c1 
++cfp(CNPId, P_name)[source(Ag)]
+	:	provider(Ag, "initiator") &
+		find_product_by_name(P_name, Products)
+   <-	.nth(0, Products, Offer);		 				// Get the first element of list
+   		+proposal(CNPId, P_name, Offer); 				// Remember my proposal
+      	.send(Ag, tell, propose(CNPId, Offer));
+      	.print("Proposal sent to ", Ag, " {proposal: ", Offer, "}").
 
+@r1 +accept_proposal(CNPId)
+   :  proposal(CNPId, P_name, Offer)
+   <- .print("I won CNP", CNPId).
+      
+      // Do the task and report to initiator - Send the product and fulfill the agreement
+
+@r2 +reject_proposal(CNPId)
+   <- .print("I lost CNP ",CNPId);
+      -proposal(CNPId,_,_). 							// Clear memory
+
+/******************** Plans of support **********************/
+
+// Checks whether a given product is in the seller's belief base
++!has_product(P_name)
+	:	find_product_by_name(P_name, Products)
+	<-	.print(Products).
+	
++!has_product(P_name)
+	:	not find_product_by_name(P_name, Products)
+	<-	.print("product not found!").
+	
+/******************** Plans for debugging **********************/
+
+// Shows the list of product when verbose is activated
 +!print_products
-	:	verbose(X) & X == true & sell(List)
-	<-	.print("--- (INFO) List of products - format{product(name, price)}:");
+	:	format_products_on_list(List)
+	<-	.printf("---------------- (INFO) -----------------");
+		.print("List of products (size: ",.length(List),") - format{p(name, price, quality, delivery time)}:");
 		!show_products_prices(List).
 
-+!show_products_prices([]).
++!print_products.
+
++!show_products_prices([])
+	<-	.printf("------------------------------------------\n").
 
 +!show_products_prices([H|T])
 	:	H \== []
-	<-	.print("------ ", H);
-		!show_products_prices(T).
-		
-+!print_products.
-			
-//+!register 
-//	<-	.df_register("participant");
-//    	.df_subscribe("initiator").
-//
-//// answer to call for buying request
-//@c1 +cfp(CNPId, Product)[source(Buyer)]
-//	:	provider(Buyer, "initiator") &
-//		price(Task,Offer)
-//   <- +proposal(CNPId,Task,Offer); // remember my proposal
-//      .send(A,tell,propose(CNPId,Offer)).
-//
-//@r1 +accept_proposal(CNPId)
-//   :  proposal(CNPId,Task,Offer)
-//   <- .print("My proposal '",Offer,"' won CNP ",CNPId, " for ",Task,"!").
-//      // do the task and report to initiator
-//
-//@r2 +reject_proposal(CNPId)
-//   <- .print("I lost CNP ",CNPId, ".");
-//      -proposal(CNPId,_,_). // clear memory
-
-
-
-
-
-
-
-//// Agent seller in project synchronised_market
-//
-///* Initial beliefs */
-////NONE
-//
-///* Initial goals */
-////NONE
-//
-///* Initial beliefs and rules */
-////check buying power
-//
-///* Plans */
-//
-//+?request(Product)[source(buyer)]
-//	:	sell(A, B, C) & (A == Product | B == Product | C == Product) 
-//	<-	entities.services.sellerDefineOfferPrice(Product, Price);
-//		.print("Price defined for: ", Product, " is:", Price);
-//		.send(buyer, tell, offer(Product, Price));
-//		.print("Offer sent to: ", buyer);
-//		!hangOn.
-//
-//+deal(R)[source(buyer)]
-//	: 	R == "accept"
-//	<-	.print("The product will be sent to buyer as soon as possible!");
-//		!hangOn.
-//	
-//+deal(R)[source(buyer)]
-//	: 	R == "reject"
-//	<-	!hangOn.
-//
-//+!hangOn
-//	:	true
-//	<-	true.
+	<-	.print("-> ", H);
+		!show_products_prices(T).	

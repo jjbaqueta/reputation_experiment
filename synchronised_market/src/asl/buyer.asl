@@ -1,150 +1,91 @@
-///* Initial rules */
-// 
-//update_amount_offers(CNPId)
-//	:- 	amount_offers(CNPId, X) &				// Retrieves the number of offers for the request CNPId
-//		.count(offer(CNPId,_)[source(_)], N) &	// Counts the number of proposals received at the moment for request CNPId 
-//		X = N.									// Updates the value of amount offers received
-//
-///* Initial goals */
-//
-///* Plans */
-//
-//// defining the initiator
-//+!register 
-//	<- .df_register(initiator).
-//
-//// start the CNP
-//+!buy(Id, Product)
-//	<-	
-//		// wait participants introduction (register of participants)
-//		.print("Waiting seller for Product ", Product, " ...");
-//      	.wait(2000); 
-//      
-//	    // seeking possible sellers (participants)
-//      	+cnp_state(Id, propose);   // remember the state of the CNP
-//      	.df_search("participant", LP);
-//      	.print("Sending CFP to ", LP);
-//      	+nb_participants(Id, .length(LP));
-//      	
-//      	// sending buying request for sellers found
-//      	.send(LP, tell, cfp(Id, Product));
-//      	
-//		// the deadline of the CNP is now + 4 seconds (or all offers were received)
-//      	.wait(update_amount_offers(Id), 4000, _);
-//      	!contract(Id).
-//
-//// this plan needs to be atomic so as not to accept
-//// proposals or refusals while contracting
-//@lc1[atomic]
-//+!contract(CNPId)
-//   :  cnp_state(CNPId,propose)
-//   <- -cnp_state(CNPId,_);
-//      +cnp_state(CNPId,contract);
-//      .findall(offer(O,A),propose(CNPId,O)[source(A)],L);
-//      .print("Offers are ",L);
-//      L \== []; // constraint the plan execution to at least one offer
-//      .min(L,offer(WOf,WAg)); // sort offers, the first is the best
-//      .print("Winner is ",WAg," with ",WOf);
-//      !announce_result(CNPId,L,WAg);
-//      -+cnp_state(CNPId,finished).
-//
-//// nothing todo, the current phase is not 'propose'
-//@lc2 +!contract(_).
-//
-//-!contract(CNPId)
-//   <- .print("CNP ",CNPId," has failed!").
-//
-//+!announce_result(_,[],_).
-//// announce to the winner
-//+!announce_result(CNPId,[offer(_,WAg)|T],WAg)
-//   <- .send(WAg,tell,accept_proposal(CNPId));
-//      !announce_result(CNPId,T,WAg).
-//// announce to others
-//+!announce_result(CNPId,[offer(_,LAg)|T],WAg)
-//   <- .send(LAg,tell,reject_proposal(CNPId));
-//      !announce_result(CNPId,T,WAg).
-//
-//
-//
-//
-//
-//
-//
-//// Agent buyer in project synchronised_market
-//
-///* Initial beliefs */
-//budget(10000.0).
-//count_offers(0).
-//has_offer(false).
-//
-///* Initial goals */
-////NONE
-//
-///* Initial beliefs and rules */
-////check buying power
-//
-///* Plans */
-//
-//+my_wish(buy, Product)
-//	: true
-//	<-	.broadcast(askOne, request(Product));
-//		.print("finding sellers ... (Product: ", Product ,")");
-//		!hangOn.		
-//
-//+offer(Product, Price)[source(seller)]
-//	:	true
-//	<-	.print("offer recevied from: ", seller, ", product: ", Product , ", price: ", Price);
-//		!set_pending(offer);
-//		?count_offers(Offers);
-//		-+count_offers(Offers + 1);
-//		!check_best_offer(Product, Price, seller).
-//		
-//-offer(Product, Price)
-//	:	true
-//	<- 	?count_offers(Offers);
-//		-+count_offers(Offers - 1).
-//
-//+count_offers(C)
-//	:	has_offer(X) & X == false & C == 1
-//	<-	?best_offer(Product, Price, Seller);
-//		-offer(Product, Price)[source(Seller)];
-//		-+count_offers(0);
-//		-+has_offer(false);
-//		?budget(B);
-//		-+budget(B - Price);
-//		.send(Seller, tell, deal(accept));
-//		.print("offer accepted (seller: ", Seller ,")");
-//		!negotiation(continue).
-//
-//+count_answers(Answers)
-//	:	count_offers(Offers) & Answers == (Offers + 1) & Offers == 0  
-//	<-	true.
-//
-//+!negotiation(continue)
-//	:	budget(X) & X <= 0
-//	<-	.print("no money to continue buying, end of negotiations");
-//		finish(neg).
-//
-//+!set_pending(offer)
-//	:	has_offer(X) & X == false
-//	<-	-+has_offer(true).
-//
-//@atomic
-//+!check_best_offer(Product, Price, seller) 
-//	:	not best_offer(Product, P, S)
-//	<-	+best_offer(Product, P, S).
-//
-//+!check_best_offer(Product, Price, seller)
-//	:	best_offer(Product, P, S) & P <= Price
-//	<-	-offer(Product, Price)[source(seller)];
-//		.send(seller, tell, deal(reject));
-//		.print("offer rejected (seller: ", seller ,")").
-//	
-//+!check_best_offer(Product, Price, seller)
-//	:	best_offer(Product, P, S) & P > Price
-//	<-	-+best_offer(Product, Price, seller);
-//		-offer(Product, P)[source(S)];
-//		.send(S, tell, deal(reject));
-//		.print("offer rejected (seller: ", S ,")").
-//	
-//+!hangOn : true <- true.
+/* Initial rules ********************************************/
+
+update_nb_offers(CNPId)
+	:- 	nb_participants(CNPId, NP) &				// Retrieves the number of participants for CNPId
+		.count(propose(CNPId,_)[source(_)], NO) &	// Counts the number of proposals received until now 
+		NP = NO.									// Updates the amount participants considering only those that sent a proposal
+
+/* Initial perceptions *************************************/
+
+/* Initial goals *******************************************/
+
+!register.
+!buy(1, tv).
+
+/* Plans ***************************************************/
+
+// The buyer is added on net as an initiator
++!register 
+	<- .df_register(initiator).
+
+// Start the CNP
++!buy(Id, P_name)
+	<-	
+		// Waiting for participants
+		.print("REQUEST CNPId: ", Id, ", PRODUCT: ", P_name);
+		.print("Waiting for sellers ...");
+      	.wait(2000); 
+      
+	    // Searching for sellers
+      	+cnp_state(Id, propose);   						// Updates the status of the CNP (protocol's state) 
+      	.df_search("participant", Sellers);				// Loads a list with the possible participants (Sellers)
+      	+nb_participants(Id, .length(Sellers));			// Updates the amount of participants
+      	.send(Sellers, tell, cfp(Id, P_name));			// Sends a call of proposal (CFP) to each participant found
+      	.print("Sending the calls for proposal ...");
+      	.print("Participants notified: ", Sellers);
+      	
+		// Waiting for all proposals arrives or by 4 seconds has passed
+      	.wait(update_nb_offers(Id), 4000, _);
+      	!contract(Id).
+
+// This plan needs to be atomic to not accept proposals while contracting
+@lc1[atomic]
++!contract(CNPId)
+ 	:	cnp_state(CNPId, propose)						// Checks if the state of CNP is in propose
+	<-	-cnp_state(CNPId,_);							// Updating the state of CNP
+      	+cnp_state(CNPId, contract);
+      	
+      	// Loading all proposals sent
+      	.findall(offer(Offer, Ag), propose(CNPId, Offer)[source(Ag)], Offers);
+      	
+      	// Constraint: If exist at least one offer, the plan must continue
+      	Offers \== []; 									
+      	.print("Offers recevied: ", Offers);     	
+      	
+      	// Take decision: evaluate all proposals and choose one seller to make a deal
+      	entities.services.buyerEvaluateOffer(Offers, Ag_winner);
+      	.print("The best offer came from: ", Ag_winner);
+      	.print("Notifying participants about decision ...");
+      	      	
+		// Notifying all participants about decision taken
+      	!announce_result(CNPId, Offers, Ag_winner);
+      	-+cnp_state(CNPId, finished).
+
+// Nothing to do, the current phase is not 'propose'
+@lc2 +!contract(_).
+
+// The execution of the contract (plan: @lc1) has failed
+-!contract(CNPId)
+   <- .print("CNP ",CNPId," has failed! - There were not proposals for request: ", CNPId).
+
+// Announce to the winner
++!announce_result(CNPId,[offer(_, Ag)|T], Ag_winner)
+	:	Ag == Ag_winner
+	<-	.send(Ag, tell, accept_proposal(CNPId));
+		!announce_result(CNPId, T, Ag_winner).
+      
+// Announce to others
++!announce_result(CNPId,[offer(_, Ag)|T], Ag_winner)
+	:	Ag \== Ag_winner
+	<-	.send(Ag, tell, reject_proposal(CNPId));
+		!announce_result(CNPId, T, Ag_winner).
+
++!announce_result(_,[],_).
+      
+/******************** Plans for debugging **********************/
+
++!print_list([H|T])
+	<-	.print("-> ", H);
+		!print_list(T).
+		
++!print_list([]).
