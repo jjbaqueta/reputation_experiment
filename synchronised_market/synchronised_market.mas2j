@@ -7,16 +7,16 @@ MAS synchronised_market {
 
 	infrastructure: Centralised
 
-	//environment: environments.Market
+	environment: environments.Market
 
 	agents:
-		
+	
 		//There is one buyer only - initiator (who need a product)
-		buyer;
+//		buyer agentClass entities.model.Buyer #1;
+//		seller agentClass entities.model.Seller #15;
 		
-		store_A	seller.asl [beliefs="sell(tv, 550.00, 0.5, 3), sell(computer, 1200.00, 0.8, 7), sell(notebook, 2300.00, 0.9, 15)"] #3;//name, price, quality, delivery time
-		store_B	seller.asl [beliefs="sell(tv, 650.00, 0.8, 5), sell(computer, 1400.00, 0.9, 10), sell(notebook, 5300.00, 1, 7)"] #3;
-		store_C	seller.asl [beliefs="sell(tablet, 300.00, 0.6, 3), sell(computer, 1400.00, 0.9, 10), sell(notebook, 5300.00, 1, 7)"] #3;
+		buyer #1;
+		seller #15;
 
 	aslSourcePath:
 		"src/asl";

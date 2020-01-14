@@ -20,18 +20,17 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	
 	/*
 	 * This method is used by buyer to decide if either accept or reject offers
-	 * An offer is composed by:
-	 * - Arcs[0]: seller's name
-	 * - args[1]: product's name
-	 * - args[2]: product's price
-	 * - args[4]: anwser for offer
+	 * The data about offers are passed from array args:
+	 * - args[0]: Contains a list with all offers received by buyer
+	 * - args[1]: return the name of seller that presented the best offer 
 	 */
 	
 	@Override
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws JasonException 
 	{
 		try
-		{		
+		{	
+			// Parsing the list of arguments : args[0]
 			String[] str_offers = args[0].toString().split("\\[offer\\(p\\(|\\),offer\\(p\\(|\\)\\]");
 			String[] attributes;
 			
@@ -47,8 +46,8 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 									 attributes[4])						// Seller's name
 			);}
 			
+			// Computing who is the best seller and return him
 			String seller = computeBestOfferByRelevance(offers, 0.0, 1.0, 0.5).getSeller();
-			
 			return un.unifies(new Atom(seller), args[1]);
 			
 		}
@@ -65,6 +64,15 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 		}
 	}
 	
+	/*
+	 * This method computes the best offer received by buyer
+	 * The computations is done from a cost function that it is adjusted considering the trade-off among the evaluation criterias
+	 * @param offers List of offers received
+	 * @param priceWeight Relevance factor of price on best offer computation, 0.0 minimum, 1.0 maximum 
+	 * @param qualityWeight Relevance factor of quality on best offer computation, 0.0 minimum, 1.0 maximum
+	 * @param timeWeight Relevance factor of delivery time on best offer computation, 0.0 minimum, 1.0 maximum
+	 * @return best seller's name
+	 */
 	private Offer computeBestOfferByRelevance(List<Offer> offers, double priceWeight, double qualityWeight, double timeWeight)
 	{	
 		// Getting optimal values for each criteria
@@ -73,10 +81,10 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 		int minTime = Collections.min(offers, (offer1, offer2) -> offer1.getDeliveryTime().compareTo(offer2.getDeliveryTime())).getDeliveryTime();
 		
 		// rating array
-		double[] ratings = new double[offers.size()];
+		double[] ratings = new double[offers.size()]; 
 		Arrays.fill(ratings, 0);
 		
-		// Normalization and computation of evaluation value	
+		// Normalization and computation of ratings of offers (from weighted average)
 		for(int i = 0; i < offers.size(); i++)
 		{
 			ratings[i] += (offers.get(i).getPrice() / minPrice) * (priceWeight);
@@ -84,14 +92,6 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 			ratings[i] += ((double) offers.get(i).getDeliveryTime() / minTime) * (timeWeight);
 			ratings[i] /= 3;
 		}
-		
-		// Show evaluation result ************
-				int k = 0;
-				for(double r : ratings)
-				{
-					System.out.println("rating: " + r + " offer: " + offers.get(k++));
-				}
-		// ***********************************
 		
 		// Defining the best offer
 		int minIdx = IntStream.range(0, ratings.length)

@@ -27,41 +27,22 @@ public class Offer {
 		return product;
 	}
 
-	public void setProduct(String product) {
-		this.product = product;
-	}
-
 	public Double getPrice() {
 		return price;
-	}
-
-	public void setPrice(Double price) {
-		this.price = price;
 	}
 
 	public Double getQuality() {
 		return quality;
 	}
 
-	public void setQuality(Double quality) {
-		this.quality = quality;
-	}
-
 	public Integer getDeliveryTime() {
 		return deliveryTime;
-	}
-
-	public void setDeliveryTime(Integer deliveryTime) {
-		this.deliveryTime = deliveryTime;
 	}
 
 	public String getSeller() {
 		return seller;
 	}
 
-	public void setSeller(String seller) {
-		this.seller = seller;
-	}
 	
 	@Override
 	public String toString() {

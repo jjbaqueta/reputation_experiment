@@ -2,7 +2,7 @@ package entities.services;
 
 import java.util.Random;
 
-import enums.Product;
+import enums.ProductDefault;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -29,7 +29,7 @@ public class sellerDefineOfferPrice extends DefaultInternalAction{
 			String productName = args[0].toString();
 			
 			//Gets the base price according to the product @see enums.Product
-			double basePrice = Product.valueOf(productName.toUpperCase()).getPrice();
+			double basePrice = ProductDefault.valueOf(productName.toUpperCase()).getPrice();
 			
 			/*
 			 * Generates a customized price for each seller

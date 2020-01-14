@@ -1,48 +1,57 @@
 package entities.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
-import enums.Product;
+import entities.services.ProductsFacade;
 import jason.asSyntax.Literal;
 
-public class Seller {
+public class Seller extends SimpleAgent implements SellerContract{
 	
-	public Seller() {}
+	private List<Literal> productsForSale;
 	
-	public Literal whatToSell(int amountOfItems, List<Product> products)
-	{
-		Set<Product> forSell = Product.getItemsForSale(amountOfItems, products);
+	public Seller(String name) {
+		super.setName(name);
+	}
+
+	/*
+	 * This method generates list of products to sale considering a specific amount of products.
+	 * Each product from the list is translate to a belief in the follow format: sell(p(product_name, product_price, product_quality, product_delivery_time))
+	 * @param amountOfItems An integer values that represents the amount of products sold
+	 * @param products List of products available to sell
+	 * @return A list of literals in belief format
+	 */
+	@Override
+	public List<Literal> whatToSell(int amountOfItems, List<Product> products) {
 		
-		if(forSell != null)
+		List<Literal> itemsForSale = new ArrayList<Literal>();  
+		
+		for(Product p : ProductsFacade.getSubsetFrom(amountOfItems, products))
 		{
-			Product[] auxArray = new Product[forSell.size()];
-		    forSell.toArray(auxArray);
-			return setPricesForProducts(auxArray);
+			itemsForSale.add(Literal.parseLiteral("sell("+p.getName().toLowerCase()+","+p.getPrice()+","+p.getQuality()+","+p.getDeliveryTime()+")"));
 		}
-		else
-			throw new NullPointerException();
+		return itemsForSale;
+	}
+
+	@Override
+	public Literal computeRealDeliveryConditions(Offer offer) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
-	private Literal setPricesForProducts(Product products[])
+	/*
+	 * This method initialize the list of products sold by seller
+	 * @param amountOfItems An integer values that represents the amount of products sold
+	 * @param products List of products available to sell
+	 */
+	public void setProductsForSale(int amountOfItems, List<Product> products)
 	{
-		Random r = new Random();
-		String belief = "sell([";
-		double basePrice, price = 0.0;
-		
-		for(int i = 0; i < products.length; i++)
-		{
-			basePrice = Product.valueOf(products[i].name()).getPrice();
-			price = basePrice + ((basePrice * 1.4) - basePrice) * r.nextDouble();
-			
-			if(i < products.length - 1)
-				belief += "p(" + products[i].name().toLowerCase() + ", " + price + "), "; 
-		}
-		
-		belief += "p(" + products[products.length - 1].name().toLowerCase() + ", " + price + ")])";
-			
-		return Literal.parseLiteral(belief);
+		productsForSale = whatToSell(amountOfItems, products); 
+	}
+	
+	public List<Literal> getProductsForSale()
+	{
+		return this.productsForSale;
 	}
 	
 }

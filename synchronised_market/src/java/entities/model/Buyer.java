@@ -2,47 +2,64 @@ package entities.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 
-import enums.NegotiationStatus;
-import enums.Product;
+import jason.asSyntax.Literal;
 
-public class Buyer {
+public class Buyer extends SimpleAgent implements BuyerContract{
 	
-	private NegotiationStatus negStatus;	//if CLOSE, the buyer cannot longer to buy
+	private Stack<Literal> productsToBuy;
 	
-	public Buyer()
+	public Buyer(String name)
 	{
-		startNegotiation();;
+		super.setName(name);
+		productsToBuy = new Stack<Literal>();
 	}
 	
 	/*
-	 * This method picks an item randomly from a given product list
-	 * @param products A List<Product> that contains all products available to buy 
-	 * @return String the name of the product picked from the list
+	 * This method picks an item randomly from product list
+	 * @param products List of products 
+	 * @return belief about the product that will be bought
 	 */
-	public String whatToBuy(List<Product> products)
-	{
+	@Override
+	public Literal whatToBuy(List<Product> products) {
 		Random rand = new Random();
-		return products.get(rand.nextInt(products.size())).name().toLowerCase();
+		Product p = products.get(rand.nextInt(products.size()));
+		return Literal.parseLiteral("buy(" + p.getName().toLowerCase() + ")");
 	}
 	
 	/*
-	 * This method defines the end of negotiations
+	 * This method adds new items to be buying
+	 * @param amountOfItems number of items add within the stack of products 
+	 * @param products List of products
 	 */
-	public void finishNegotiation()
+	public void addItemsToBuy(int amountOfItems, List<Product> products)
 	{
-		negStatus = NegotiationStatus.CLOSE;
+		while(amountOfItems > 0)
+		{
+			productsToBuy.push(whatToBuy(products));
+			amountOfItems--;
+		}
 	}
 	
 	/*
-	 * This method defines the begin of negotiations
+	 * This method removes item on top of stack of buying
 	 */
-	public void startNegotiation()
+	public void removeItemBought()
 	{
-		negStatus = NegotiationStatus.OPEN;
+		productsToBuy.pop();
+	}
+	
+	/*
+	 * This method checks if the buyer still want to buy
+	 * @return true if there is buying desire, otherwise false
+	 */
+	public boolean hasBuyingDesire()
+	{
+		return productsToBuy.isEmpty();
 	}
 
-	public NegotiationStatus getNegotiationStatus() {
-		return negStatus;
-	}	
+	public Stack<Literal> getProductsToBuy() {
+		return productsToBuy;
+	}
 }
