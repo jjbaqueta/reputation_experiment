@@ -1,49 +1,42 @@
 package entities.model;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Stack;
 
+import entities.services.MarketFacade;
 import jason.asSyntax.Literal;
 
-public class Buyer extends SimpleAgent implements BuyerContract{
+public abstract class Buyer extends SimpleAgent{
 	
 	private Stack<Literal> productsToBuy;
 	
-	public Buyer(String name)
+	private double preferenceByPrice;
+	private double preferenceByQuality;
+	private double preferenceByDelivery;
+	
+	public Buyer(String name, int amountOfItems, List<Product> products)
 	{
 		super.setName(name);
 		productsToBuy = new Stack<Literal>();
+		addItemsToBuy(amountOfItems, products);
 	}
 	
 	/*
-	 * This method picks an item randomly from product list
-	 * @param products List of products 
-	 * @return belief about the product that will be bought
+	 * This method adds new items to the buying stack from buyer
+	 * @param amountOfItems number of product orders that will be added within buying stack 
+	 * @param products List of available products for sale
 	 */
-	@Override
-	public Literal whatToBuy(List<Product> products) {
-		Random rand = new Random();
-		Product p = products.get(rand.nextInt(products.size()));
-		return Literal.parseLiteral("buy(" + p.getName().toLowerCase() + ")");
-	}
-	
-	/*
-	 * This method adds new items to be buying
-	 * @param amountOfItems number of items add within the stack of products 
-	 * @param products List of products
-	 */
-	public void addItemsToBuy(int amountOfItems, List<Product> products)
+	private void addItemsToBuy(int amountOfItems, List<Product> products)
 	{
 		while(amountOfItems > 0)
 		{
-			productsToBuy.push(whatToBuy(products));
+			productsToBuy.push(MarketFacade.whatToBuy(products));
 			amountOfItems--;
 		}
 	}
 	
 	/*
-	 * This method removes item on top of stack of buying
+	 * This method removes the product order on the top of the buying stack
 	 */
 	public void removeItemBought()
 	{
@@ -51,8 +44,8 @@ public class Buyer extends SimpleAgent implements BuyerContract{
 	}
 	
 	/*
-	 * This method checks if the buyer still want to buy
-	 * @return true if there is buying desire, otherwise false
+	 * This method checks if the buyer wants continue buying
+	 * @return false, case the buying stack is empty, otherwise true
 	 */
 	public boolean hasBuyingDesire()
 	{
@@ -62,4 +55,42 @@ public class Buyer extends SimpleAgent implements BuyerContract{
 	public Stack<Literal> getProductsToBuy() {
 		return productsToBuy;
 	}
+
+	public double getPreferenceByPrice() {
+		return preferenceByPrice;
+	}
+
+	public void setPreferenceByPrice(double preferenceByPrice) {
+		this.preferenceByPrice = preferenceByPrice;
+	}
+
+	public double getPreferenceByQuality() {
+		return preferenceByQuality;
+	}
+
+	public void setPreferenceByQuality(double preferenceByQuality) {
+		this.preferenceByQuality = preferenceByQuality;
+	}
+
+	public double getPreferenceByDelivery() {
+		return preferenceByDelivery;
+	}
+
+	public void setPreferenceByDelivery(double preferenceByDelivery) {
+		this.preferenceByDelivery = preferenceByDelivery;
+	}
+
+	public void setProductsToBuy(Stack<Literal> productsToBuy) {
+		this.productsToBuy = productsToBuy;
+	}
+	
+	public Literal getPreferencesAsLiteral()
+	{
+		return Literal.parseLiteral("pref("+ preferenceByPrice + "," + preferenceByQuality + "," + preferenceByDelivery +")");
+	}
+	
+	/*
+	 * This method must be used to define the buyer's preferences in relation to price, quality and delivery
+	 */
+	public abstract void setMyPreferences();
 }

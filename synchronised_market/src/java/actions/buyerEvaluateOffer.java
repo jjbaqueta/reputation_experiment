@@ -1,4 +1,4 @@
-package entities.services;
+package actions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import entities.model.Buyer;
 import entities.model.Offer;
+import environments.Market;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -22,7 +24,8 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	 * This method is used by buyer to decide if either accept or reject offers
 	 * The data about offers are passed from array args:
 	 * - args[0]: Contains a list with all offers received by buyer
-	 * - args[1]: return the name of seller that presented the best offer 
+	 * - args[1]: Contains the buyer's name
+	 * - args[2]: Return the name of seller that presented the best offer 
 	 */
 	
 	@Override
@@ -30,10 +33,18 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	{
 		try
 		{	
+			// Get the index of buyer
+			int index = 0;
+			
+			if(!args[1].toString().equals("buyer"))
+				index = Integer.parseInt(args[1].toString().split("buyer")[1]);
+
+			Buyer buyer = Market.buyers[index];
+			
 			// Parsing the list of arguments : args[0]
 			String[] str_offers = args[0].toString().split("\\[offer\\(p\\(|\\),offer\\(p\\(|\\)\\]");
-			String[] attributes;
 			
+			String[] attributes;			
 			List<Offer> offers = new ArrayList<Offer>();		
 			
 			for(int i = 1; i < str_offers.length; i++)
@@ -47,9 +58,11 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 			);}
 			
 			// Computing who is the best seller and return him
-			String seller = computeBestOfferByRelevance(offers, 0.0, 1.0, 0.5).getSeller();
-			return un.unifies(new Atom(seller), args[1]);
+			String seller = computeBestOfferByRelevance(offers, buyer.getPreferenceByPrice(), buyer.getPreferenceByQuality(), buyer.getPreferenceByDelivery()).getSeller();
 			
+			System.out.println("name: "+ args[1] + "," + buyer.getPreferenceByPrice() + "," + buyer.getPreferenceByQuality() + "," + buyer.getPreferenceByDelivery());
+			
+			return un.unifies(new Atom(seller), args[2]);	
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{
@@ -80,7 +93,7 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 		double maxQuality = Collections.max(offers, (offer1, offer2) -> offer1.getQuality().compareTo(offer2.getQuality())).getQuality();
 		int minTime = Collections.min(offers, (offer1, offer2) -> offer1.getDeliveryTime().compareTo(offer2.getDeliveryTime())).getDeliveryTime();
 		
-		// rating array
+		// Rating array
 		double[] ratings = new double[offers.size()]; 
 		Arrays.fill(ratings, 0);
 		

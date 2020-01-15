@@ -1,4 +1,4 @@
-package entities.services;
+package actions;
 
 import java.util.Random;
 

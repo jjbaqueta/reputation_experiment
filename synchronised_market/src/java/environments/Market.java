@@ -1,28 +1,41 @@
 package environments;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import entities.model.Buyer;
+import entities.model.GeneralOrientedBuyer;
 import entities.model.Product;
 import entities.model.Seller;
+import entities.services.BuyerFactory;
 import entities.services.ProductsFacade;
+import entities.services.SellerFactory;
+import enums.BuyerType;
+import enums.SellerType;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
 
 public class Market extends Environment{
 	
-	// Parameters for experiments:
-	public static final int NUMBER_OF_SELLERS = 15;
-	public static final int NUMBER_OF_BUYERS = 1;
-	public static final int AMOUNT_OF_ITEMS_SELL = 3;		//at most 5
-	public static final int AMOUNT_OF_ITEMS_BUY = 1;
-	
+	// Constants:
+	private static final int BAD_SELLERS = 1;
+	private static final int GOOD_SELLERS = 0;
+	private static final int NEUTRAL_SELLERS = 0;
+	private static final int ITEMS_SOLD_BY_SELLER = 3;
+
+	private static final int PRICE_BUYERS = 0;
+	private static final int QUALITY_BUYERS = 0;
+	private static final int DELIVERY_BUYERS = 0;
+	private static final int GENERAL_BUYERS = 1;
+	private static final int ORDERS_BY_BUYER = 3;
+			
 	// Attributes;
-	private Buyer[] buyers;
-	private Seller[] sellers;
 	private List<Product> availableProducts;
     private Logger logger;
+    
+	public static Buyer[] buyers;
+	public static Seller[] sellers;
     
     /** Called before the MAS execution with the args informed in .mas2j */
     
@@ -32,27 +45,70 @@ public class Market extends Environment{
     	super.init(args);
     	
 		try {
+			
 			// Creating products
 			availableProducts = ProductsFacade.generateCompleteListOfProducts();
 			ProductsFacade.showProducts(availableProducts);
 			
-			// Initializing the agents
-			buyers = new Buyer[NUMBER_OF_BUYERS];
-			sellers = new Seller[NUMBER_OF_SELLERS];
+			// Initializing sellers		
+			int j = 0;
+			sellers = new Seller[BAD_SELLERS + NEUTRAL_SELLERS + GOOD_SELLERS];
 			
-			for(int i = 0; i < NUMBER_OF_BUYERS; i++)
+			for(int i = 0; i < BAD_SELLERS; i++)
 			{
-				buyers[i] = new Buyer("buyer" + i);
-				buyers[i].addItemsToBuy(AMOUNT_OF_ITEMS_BUY, availableProducts);			
+				sellers[j] = SellerFactory.getSeller(SellerType.BAD, "seller" + (j + 1), ITEMS_SOLD_BY_SELLER, availableProducts);
+				j++;
+			}
+	
+			for(int i = 0; i < NEUTRAL_SELLERS; i++)
+			{
+				sellers[j] = SellerFactory.getSeller(SellerType.NEUTRAL, "seller" + (j + 1), ITEMS_SOLD_BY_SELLER, availableProducts);
+				j++;
 			}
 			
-			for(int i = 0; i < NUMBER_OF_SELLERS; i++)
+			for(int i = 0; i < GOOD_SELLERS; i++)
 			{
-				sellers[i] = new Seller("seller" + (i + 1));
-				sellers[i].setProductsForSale(AMOUNT_OF_ITEMS_SELL, availableProducts);
-			}	
+				sellers[j] = SellerFactory.getSeller(SellerType.GOOD, "seller" + (j + 1), ITEMS_SOLD_BY_SELLER, availableProducts);
+				j++;
+			}
 			
-		} catch (Exception e) {
+			// Initializing buyers	
+			j = 0;
+			buyers = new Buyer[PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS];
+			
+			for(int i = 0; i < PRICE_BUYERS; i++)
+			{
+				buyers[j] = BuyerFactory.getBuyer(BuyerType.PRICE_ORIENTED, "buyer" + (j + 1), ORDERS_BY_BUYER, availableProducts);
+				j++;
+			}
+			
+			for(int i = 0; i < QUALITY_BUYERS; i++)
+			{
+				buyers[j] = BuyerFactory.getBuyer(BuyerType.QUALITY_ORIENTED, "buyer" + (j + 1), ORDERS_BY_BUYER, availableProducts);
+				j++;
+			}
+			
+			for(int i = 0; i < DELIVERY_BUYERS; i++)
+			{
+				buyers[j] = BuyerFactory.getBuyer(BuyerType.DELIVERY_ORIENTED, "buyer" + (j + 1), ORDERS_BY_BUYER, availableProducts);
+				j++;
+			}
+			
+			Random rand = new Random();
+			for(int i = 0; i < GENERAL_BUYERS; i++)
+			{
+				buyers[j] = new GeneralOrientedBuyer(ORDERS_BY_BUYER, availableProducts, "buyer" + (j + 1), rand.nextDouble(), rand.nextDouble(), rand.nextDouble());
+				j++;
+			}
+			
+			// When only one agent is defined, there is not a id after the agent's name
+			if(sellers.length == 1)
+				sellers[0].setName("seller");
+			
+			if(buyers.length == 1)
+				buyers[0].setName("buyer");	
+		} 
+		catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
@@ -66,22 +122,21 @@ public class Market extends Environment{
     //This method defines action points which triggers perceptions within environment
     public void updatePercepts()
     {
-    	for(Buyer b: buyers)
+    	for(Buyer buyer : buyers)
     	{
-    		clearPercepts(b.getName());
-    		addPercept(b.getName(), b.getProductsToBuy().pop());
+    		clearPercepts(buyer.getName());
+    		addPercept(buyer.getName(), buyer.getProductsToBuy().pop());
     	}
     	
-    	for(int i = 0; i < NUMBER_OF_SELLERS; i++)
-		{
-    		clearPercepts(sellers[i].getName());
+    	for(Seller seller : sellers)
+    	{
+    		clearPercepts(seller.getName());
     		
-    		for(Literal l : sellers[i].getProductsForSale())
+    		for(Literal literal : seller.getProductsAsLiteral())
     		{
-//    			System.out.println(sellers[i].getName() + ", " + l);
-    			addPercept(sellers[i].getName(), l);
+    			addPercept(seller.getName(), literal);
     		}
-		}	
+    	}
     }
 
     //This method call some specific actions implemented in Java according to some conditions

@@ -10,7 +10,6 @@ update_nb_offers(CNPId)
 /* Initial goals *******************************************/
 
 !register.
-!buy(1, tv).
 
 /* Plans ***************************************************/
 
@@ -19,7 +18,7 @@ update_nb_offers(CNPId)
 	<- .df_register(initiator).
 
 // Start the CNP
-+!buy(Id, P_name)
++buy(Id, P_name)
 	<-	
 		// Waiting for participants
 		.print("REQUEST CNPId: ", Id, ", PRODUCT: ", P_name);
@@ -53,7 +52,8 @@ update_nb_offers(CNPId)
       	.print("Offers recevied: ", Offers);     	
       	
       	// Take decision: evaluate all proposals and choose one seller to make a deal
-      	entities.services.buyerEvaluateOffer(Offers, Ag_winner);
+      	.my_name(N);
+      	actions.buyerEvaluateOffer(Offers, N, Ag_winner);
       	.print("The best offer came from: ", Ag_winner);
       	.print("Notifying participants about decision ...");
       	      	

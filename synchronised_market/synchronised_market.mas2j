@@ -10,13 +10,9 @@ MAS synchronised_market {
 	environment: environments.Market
 
 	agents:
-	
-		//There is one buyer only - initiator (who need a product)
-//		buyer agentClass entities.model.Buyer #1;
-//		seller agentClass entities.model.Seller #15;
 		
 		buyer #1;
-		seller #15;
+		seller #1;
 
 	aslSourcePath:
 		"src/asl";

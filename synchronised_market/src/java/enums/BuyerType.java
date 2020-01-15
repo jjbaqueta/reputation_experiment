@@ -1,0 +1,8 @@
+package enums;
+
+public enum BuyerType {
+	PRICE_ORIENTED,
+	QUALITY_ORIENTED,
+	DELIVERY_ORIENTED,
+	GENERAL_ORIENTED
+}
