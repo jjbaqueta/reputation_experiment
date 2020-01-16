@@ -17,6 +17,9 @@ update_nb_offers(CNPId)
 +!register 
 	<- .df_register(initiator).
 
+// End of negotiations
++buy(nothing).
+
 // Start the CNP
 +buy(Id, P_name)
 	<-	
@@ -58,15 +61,18 @@ update_nb_offers(CNPId)
       	.print("Notifying participants about decision ...");
       	      	
 		// Notifying all participants about decision taken
-      	!announce_result(CNPId, Offers, Ag_winner);
-      	-+cnp_state(CNPId, finished).
+		+winner(CNPId, Ag_winner);
+      	!announce_result(CNPId, Offers, Ag_winner).
 
 // Nothing to do, the current phase is not 'propose'
 @lc2 +!contract(_).
 
 // The execution of the contract (plan: @lc1) has failed
 -!contract(CNPId)
-   <- .print("CNP ",CNPId," has failed! - There were not proposals for request: ", CNPId).
+	<-	.print("CNP ",CNPId," has failed! - There were not proposals for request: ", CNPId);
+		-cnp_state(CNPId,_);
+		+cnp_state(CNPId, finished);
+		buy(finished).
 
 // Announce to the winner
 +!announce_result(CNPId,[offer(_, Ag)|T], Ag_winner)
@@ -81,7 +87,24 @@ update_nb_offers(CNPId)
 		!announce_result(CNPId, T, Ag_winner).
 
 +!announce_result(_,[],_).
-      
+
++delivered(CNPId, NewOffer)[source(Ag)]
+	:	cnp_state(CNPId, contract)
+	<-	!evaluate(CNPId, NewOffer, Ag);
+		-cnp_state(CNPId,_);
+		+cnp_state(CNPId, finished);
+		buy(finished).
+		
++!evaluate(CNPId, NewOffer, Seller)
+	:	propose(CNPId, Offer)[source(Seller)]
+	<-	.my_name(N);
+		actions.buyerEvaluateContract(N, Seller, Offer, NewOffer, Rating);
+		//.send(Seller, tell, Rating);
+		//+rating(Seller, Rating)
+		.print("evaluating ...").
+//call rep model
+
+
 /******************** Plans for debugging **********************/
 
 +!print_list([H|T])

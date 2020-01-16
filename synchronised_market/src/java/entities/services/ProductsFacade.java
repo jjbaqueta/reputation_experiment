@@ -168,13 +168,11 @@ public class ProductsFacade {
      */
     public static void showProducts(List<Product> products)
     {
-    	System.out.println("-----------------------------------------");
-    	System.out.println("Products:");
+    	System.out.println("\n--------------------- PRODUCTS AVAILABLE (DEFAULT) --------------------\n");
     	
     	for(Product p : products)
     	{
-    		System.out.println(p);
+    		System.out.println("   -> " + p);
     	}
-    	System.out.println("-----------------------------------------");
     }
 }

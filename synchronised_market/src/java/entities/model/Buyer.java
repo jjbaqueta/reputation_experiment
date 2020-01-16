@@ -49,7 +49,7 @@ public abstract class Buyer extends SimpleAgent{
 	 */
 	public boolean hasBuyingDesire()
 	{
-		return productsToBuy.isEmpty();
+		return !productsToBuy.isEmpty();
 	}
 
 	public Stack<Literal> getProductsToBuy() {

@@ -18,28 +18,29 @@ public class NeutralSeller extends Seller{
 		
 		double realPrice = offerAgreement.getPrice();
 		double realQuality = offerAgreement.getQuality();
-		double realDeliveryTime = offerAgreement.getDeliveryTime();
+		int realDeliveryTime = offerAgreement.getDeliveryTime();
 		
 		/*
 		 * Compute the probability of change the initial contract
-		 * In this case, 1/10
+		 * In this case, there is a probability of 50% of the seller changes one of conditions from contract
+		 * However, the probability of a specific condition to change is approximately 16%
 		 */
-		int probFactor = rand.nextInt(9);
+		int probFactor = rand.nextInt(6);
 		
 		if(probFactor == 0)
 		{
-			realPrice = offerAgreement.getPrice() * (1 + (0.2 * rand.nextInt(1)));
+			realPrice = offerAgreement.getPrice() * (1 + (rand.nextDouble()));
 		}
 		else if(probFactor == 1)
 		{
-			realQuality = offerAgreement.getQuality() - (offerAgreement.getQuality() * (0.2 * rand.nextInt(1)));
+			realQuality = offerAgreement.getQuality() - (offerAgreement.getQuality() * (rand.nextDouble()));
 		}
 		else if (probFactor == 2)
 		{
-			realDeliveryTime = offerAgreement.getDeliveryTime() * (1 + (0.3 * rand.nextInt(1)));
+			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + (rand.nextDouble())));
 		}
 		
-		return Literal.parseLiteral("offer(" + offerAgreement.getProduct() + "," + realPrice + "," + realQuality + "" + realDeliveryTime + ")");
+		return Literal.parseLiteral("p(" + offerAgreement.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
 	}
 
 }

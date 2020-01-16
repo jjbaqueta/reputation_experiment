@@ -12,7 +12,7 @@ public class GoodSeller extends Seller{
 
 	@Override
 	public Literal computeRealDeliveryConditions(Offer offerAgreement) {
-		return Literal.parseLiteral("offer(" + offerAgreement.getProduct() + "," + offerAgreement.getPrice() + "," + offerAgreement.getQuality() + "" + offerAgreement.getDeliveryTime() + ")");
+		return Literal.parseLiteral("p(" + offerAgreement.getProduct() + "," + offerAgreement.getPrice() + "," + offerAgreement.getQuality() + "," + offerAgreement.getDeliveryTime() + ")");
 	}
 
 }

@@ -8,6 +8,7 @@ import entities.model.GeneralOrientedBuyer;
 import entities.model.Product;
 import entities.model.Seller;
 import entities.services.BuyerFactory;
+import entities.services.MarketFacade;
 import entities.services.ProductsFacade;
 import entities.services.SellerFactory;
 import enums.BuyerType;
@@ -19,7 +20,7 @@ import jason.environment.Environment;
 public class Market extends Environment{
 	
 	// Constants:
-	private static final int BAD_SELLERS = 1;
+	private static final int BAD_SELLERS = 4;
 	private static final int GOOD_SELLERS = 0;
 	private static final int NEUTRAL_SELLERS = 0;
 	private static final int ITEMS_SOLD_BY_SELLER = 3;
@@ -48,7 +49,6 @@ public class Market extends Environment{
 			
 			// Creating products
 			availableProducts = ProductsFacade.generateCompleteListOfProducts();
-			ProductsFacade.showProducts(availableProducts);
 			
 			// Initializing sellers		
 			int j = 0;
@@ -116,6 +116,11 @@ public class Market extends Environment{
         //Loading logger to show messages
         logger = Logger.getLogger("Log messages for Class: " + Market.class.getName());
         
+        //Showing informations for debugging
+		ProductsFacade.showProducts(availableProducts);
+		MarketFacade.showBuyersAndSellersInformations();
+        
+		System.out.println("\n--------------------- STARTING JASON APPLICATION --------------------\n");
         updatePercepts();
     }
     
@@ -145,14 +150,27 @@ public class Market extends Environment{
         
     	logger.info("agent: " + agName + " is executing: " + action);
     	
-//    	//The negotiations may finish when the buyer doesn't have more money or when there aren't offers
-//    	if(action.equals(Literal.parseLiteral("finish(negotiations)")))
-//    	{
-//    		buyer.finishNegotiation();
-//    	}	
-//	    else {
-//	        logger.warning("executing: " + action + ", but not implemented!");
-//	    }
+    	// Continue buying until the order list is empty
+    	if(action.equals(Literal.parseLiteral("buy(finished)")))
+    	{
+    		int index = MarketFacade.getBuyerIdFrom(agName);
+    		
+    		if(buyers[index].hasBuyingDesire())
+    		{
+    			clearPercepts(agName);
+        		addPercept(agName, buyers[index].getProductsToBuy().pop());
+    		}
+    		else
+    		{
+    			clearPercepts(agName);
+        		addPercept(agName, Literal.parseLiteral("buy(nothing)"));
+        		logger.info("agent: " + agName + " finished his negotiations");
+    		}
+    	}	
+	    else 
+	    {
+	        logger.warning("executing: " + action + ", but not implemented!");
+	    }
        
         return true; // the action was executed with success
     }

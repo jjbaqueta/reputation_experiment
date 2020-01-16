@@ -12,7 +12,7 @@ MAS synchronised_market {
 	agents:
 		
 		buyer #1;
-		seller #1;
+		seller #4;
 
 	aslSourcePath:
 		"src/asl";

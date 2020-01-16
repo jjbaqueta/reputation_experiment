@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 
 import entities.model.Buyer;
 import entities.model.Offer;
+import entities.services.MarketFacade;
 import environments.Market;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
@@ -22,7 +23,7 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	
 	/*
 	 * This method is used by buyer to decide if either accept or reject offers
-	 * The data about offers are passed from array args:
+	 * The offer's data are passed from array args:
 	 * - args[0]: Contains a list with all offers received by buyer
 	 * - args[1]: Contains the buyer's name
 	 * - args[2]: Return the name of seller that presented the best offer 
@@ -33,12 +34,8 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	{
 		try
 		{	
-			// Get the index of buyer
-			int index = 0;
-			
-			if(!args[1].toString().equals("buyer"))
-				index = Integer.parseInt(args[1].toString().split("buyer")[1]);
-
+			// Get the index of the buyer
+			int index = MarketFacade.getBuyerIdFrom(args[1].toString());
 			Buyer buyer = Market.buyers[index];
 			
 			// Parsing the list of arguments : args[0]
@@ -59,8 +56,6 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 			
 			// Computing who is the best seller and return him
 			String seller = computeBestOfferByRelevance(offers, buyer.getPreferenceByPrice(), buyer.getPreferenceByQuality(), buyer.getPreferenceByDelivery()).getSeller();
-			
-			System.out.println("name: "+ args[1] + "," + buyer.getPreferenceByPrice() + "," + buyer.getPreferenceByQuality() + "," + buyer.getPreferenceByDelivery());
 			
 			return un.unifies(new Atom(seller), args[2]);	
 		}

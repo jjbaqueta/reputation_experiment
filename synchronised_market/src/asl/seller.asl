@@ -22,8 +22,7 @@ find_product_by_name(P_name, Products)
 +!register
 	:	format_products_on_list(Products) 
 	<-	.df_register("participant");
-    	.df_subscribe("initiator");
-    	.print("sell: ", Products).
+    	.df_subscribe("initiator").
 
 // Answering a buying request
 @c1 
@@ -35,16 +34,25 @@ find_product_by_name(P_name, Products)
       	.send(Ag, tell, propose(CNPId, Offer));
       	.print("Proposal sent to ", Ag, " {proposal: ", Offer, "}").
 
-@r1 +accept_proposal(CNPId)
-   :  proposal(CNPId, P_name, Offer)
-   <- .print("I won CNP", CNPId).
+@r1 +accept_proposal(CNPId)[source(Ag)]
+	:	proposal(CNPId, P_name, Offer)
+	<-	.print("I won CNP, starting the delivery process ...", CNPId);
+		!delivery(CNPId, Ag).
       
       // Do the task and report to initiator - Send the product and fulfill the agreement
 
-@r2 +reject_proposal(CNPId)
-   <- .print("I lost CNP ",CNPId);
-      -proposal(CNPId,_,_). 							// Clear memory
+@r2 +reject_proposal(CNPId)[source(Ag)]
+	<-	.print("I lost CNP ",CNPId);
+		-proposal(CNPId,_,_). 							// Clear memory
 
++!delivery(CNPId, Buyer)
+	:	proposal(CNPId, P_name, Offer)
+	<-	.my_name(N);
+		actions.sellerComputeRealDeliveryConditions(N, Offer, NewOffer);
+		.print("Original contract: ", Offer);
+		.print("New contract: ", NewOffer);
+		.send(Buyer, tell, delivered(CNPId, NewOffer)).
+	
 /******************** Plans of support **********************/
 
 // Checks whether a given product is in the seller's belief base
