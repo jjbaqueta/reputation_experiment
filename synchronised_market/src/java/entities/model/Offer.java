@@ -43,6 +43,44 @@ public class Offer {
 		return seller;
 	}
 
+	/*
+	 * This method translates an offer(belief) to an offer(object)
+	 * Belief format:"offer(p(product_name,product_price,product_quality,product_delivery),seller_name)"
+	 * @param strOffer A string that represents the input belief
+	 * @return An object offer 
+	 */
+	public static Offer parseOffer(String strOffer)
+	{
+		String[] attributes = strOffer.split("offer\\(p\\(|\\)*\\,|\\)");;
+		
+		String productName = attributes[1];
+		Double price =  Double.parseDouble(attributes[2]);
+		Double quality = Double.parseDouble(attributes[3]);
+		Integer delivery = Integer.parseInt(attributes[4]);
+		String sellerName = attributes[5];
+		
+		return new Offer(productName, price, quality, delivery, sellerName);
+	}
+	
+	
+	/*
+	 * This method translates an proposal(belief) to an offer(object)
+	 * Belief format:"p(product_name,product_price,product_quality,product_delivery)"
+	 * @param strOffer A string that represents the input belief
+	 * @param sellerName A string that represents the seller
+	 * @return An object offer 
+	 */
+	public static Offer parseProposal(String strOffer, String sellerName)
+	{
+		String[] attributes = strOffer.split("p\\(|\\)")[1].split("\\,");
+		
+		String pName = attributes[0];
+		double pPrice = Double.parseDouble(attributes[1]);
+		double pQuality = Double.parseDouble(attributes[2]);
+		int pDelivery = Integer.parseInt(attributes[3]);
+		
+		return new Offer(pName, pPrice, pQuality, pDelivery, sellerName);
+	}
 	
 	@Override
 	public String toString() {

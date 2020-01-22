@@ -1,5 +1,11 @@
 package actions;
 
+import entities.model.Buyer;
+import entities.model.Impression;
+import entities.model.Offer;
+import entities.model.Seller;
+import entities.services.MarketFacade;
+import environments.Market;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -16,8 +22,8 @@ public class buyerEvaluateContract extends DefaultInternalAction{
 	 * The contract's data are passed from array args:
 	 * - args[0]: buyer's name
 	 * - args[1]: seller's name
-	 * - args[2]: original offer
-	 * - args[3]: current offer
+	 * - args[2]: original offer (proposal)
+	 * - args[3]: current offer (contract)
 	 * - args[4]: return the rating about the seller's behaviour 
 	 */	
 	@Override
@@ -25,20 +31,23 @@ public class buyerEvaluateContract extends DefaultInternalAction{
 	{		
 		try
 		{	
-//			// Get the index of the seller
-//			int index = MarketFacade.getSellerIdFrom(args[0].toString());
-//			Seller seller = Market.sellers[index];
-//			
-//			// Parsing the offer received
-//			String[] attributes = args[1].toString().split("p\\(|\\)")[1].split("\\,");
-//			
-//			String pName = attributes[0];
-//			double pPrice = Double.parseDouble(attributes[1]);
-//			double pQuality = Double.parseDouble(attributes[2]);
-//			int pDelivery = Integer.parseInt(attributes[3]);
-//			
-//			Offer offer = new Offer(pName, pPrice, pQuality, pDelivery, seller.getName());
-						
+			// Get the index from buyer
+			int index = MarketFacade.getBuyerIdFrom(args[0].toString());
+			Buyer buyer = Market.buyers[index];
+			
+			// Get the index from seller
+			index = MarketFacade.getSellerIdFrom(args[1].toString());
+			Seller seller = Market.sellers[index];
+			
+			Offer proposal = Offer.parseProposal(args[2].toString(), seller.getName());
+			Offer contract = Offer.parseProposal(args[3].toString(), seller.getName());
+			
+			Impression imp = evaluateSeller(proposal, contract, buyer, seller);
+			
+			System.out.println(imp);
+			
+			System.out.println(imp.getImpressionAsLiteral().toString());
+			
 			System.out.println(args[0]);
 			System.out.println(args[1]);
 			System.out.println(args[2]);
@@ -54,5 +63,46 @@ public class buyerEvaluateContract extends DefaultInternalAction{
 		{
 			throw new JasonException(e.getMessage());
 		}
+	}
+	
+	/*
+	 * This method computes a reputation value for each criterion defined on the reputation model
+	 * @param proposal Initial offer defined by seller
+	 * @param contract Real offer considering respective penalties (like delivery delay and quality reductions)
+	 * @param buyer appraiser
+	 * @param seller evaluated
+	 * @return A impression from buyer with respect to seller (rating)
+	 */
+	private Impression evaluateSeller(Offer proposal, Offer contract, Buyer buyer, Seller seller)
+	{
+		double priceDiscrepancy = contract.getPrice() / proposal.getPrice();
+		double qualityDiscrepancy = contract.getQuality() / proposal.getQuality();
+		double deliveryDiscrepancy = (double) contract.getDeliveryTime() / proposal.getDeliveryTime();
+		
+		Impression impression = new Impression(buyer, seller, System.currentTimeMillis());
+		
+		impression.setRating("price", getScore(priceDiscrepancy));
+		impression.setRating("quality", getScore(qualityDiscrepancy));
+		impression.setRating("delivery", getScore(deliveryDiscrepancy));
+		
+		return impression;
+	}
+	
+	/*
+	 * This method defines the score for each evaluation criterion
+	 * The minimum score is 0 and the maximum score is 10.
+	 * When variation is 1, it means that the contract hasn't been change, at least for the evaluated criterion.
+	 * On the other hand, if variation is larger or equals to 2, it means the evaluated criterion has its value at least doubled.
+	 * @param variation Normalized value that represents the discrepancy between the proposal and the contract
+	 * @return rating value with respect to an evaluation criterion
+	 */
+	private double getScore (double variation)
+	{	
+		if(variation <= 1)
+			return 10.0;					//maximum score
+		else if(variation >= 2)
+			return 0;						//minimum score
+		else
+			return -10 * (variation - 2);	//intermediate score (based on line equation)
 	}
 }

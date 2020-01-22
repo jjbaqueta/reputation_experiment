@@ -34,7 +34,7 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	{
 		try
 		{	
-			// Get the index of the buyer
+			// Get the index from buyer
 			int index = MarketFacade.getBuyerIdFrom(args[1].toString());
 			Buyer buyer = Market.buyers[index];
 			

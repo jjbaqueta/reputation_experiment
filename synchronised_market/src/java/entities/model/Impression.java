@@ -1,64 +1,76 @@
 package entities.model;
 
-import java.time.LocalTime;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map.Entry;
 
-import jason.asSemantics.Agent;
+import jason.asSyntax.Literal;
 
-public class Impression<K, V> {
-	private Agent appraiser;
-	private Agent evaluated;
-	private LocalTime time;
-	private Dictionary<K, V> ratings;
+public class Impression {
+	private SimpleAgent appraiser;
+	private SimpleAgent evaluated;
+	private long time;
+	private Dictionary<String, Object> ratings;
 	
-	public Impression(Agent appraiser, Agent evaluated, LocalTime time) {
+	public Impression(SimpleAgent appraiser, SimpleAgent evaluated, long time) 
+	{
 		this.appraiser = appraiser;
 		this.evaluated = evaluated;
 		this.time = time;
-		this.ratings = new Hashtable<K, V>();
-	}
-
-	public void insertRatingsFromList(List<Entry<K, V>> ratings)
-	{
-		for(Entry<K, V> rate : ratings)
-		{
-			this.ratings.put(rate.getKey(), rate.getValue());
-		}
+		this.ratings = new Hashtable<String, Object>();
 	}
 	
-	public void insertRating(K key, V value)
+	public <T> void setRating(String criteriaName, T value)
 	{
-		ratings.put(key, value).equals(value);
+		ratings.put(criteriaName, value);
 	}
 	
-	public Agent getAppraiser() {
+	public SimpleAgent getAppraiser() {
 		return appraiser;
 	}
 
-	public Agent getEvaluated() {
+	public SimpleAgent getEvaluated() {
 		return evaluated;
 	}
 
-	public LocalTime getTime() {
+	public long getTime() {
 		return time;
 	}
 
-	public Dictionary<K, V> getRatings() {
+	public Dictionary<String, Object> getRatings() {
 		return ratings;
 	}
-
+		
+	/*
+	 * This method convert an impression to a belief.
+	 * Each belief is defined as follow: imp(appraiser, evaluated, [rating1, rating2, rating3, ...])[add_time(time)]
+	 * @return a belief
+	 */
+	public Literal getImpressionAsLiteral()
+	{
+		List<Criteria> list = ReputationModel.criteria;
+		String strCriteria = "[";
+		
+		for(int i = 0; i < list.size() - 1; i++)
+		{
+			strCriteria += ratings.get(list.get(i).getName());
+			strCriteria += ",";
+		}
+		strCriteria += ratings.get(list.get(list.size() - 1).getName());
+		strCriteria += "]";
+		
+		return Literal.parseLiteral("imp("+appraiser.getName()+","+evaluated.getName()+","+strCriteria+")[add_time("+time+")]");
+	}
+	
 	@Override
 	public String toString() {
 		
+		List<Criteria> list = ReputationModel.criteria;
 		String strRatings = ", ratings={";
 		
-		for(Enumeration<K> key = ratings.keys(); key.hasMoreElements();)
+		for(int i = 0; i < list.size(); i++)
 		{
-			strRatings += "(key=" + key + " : value=" + ratings.get(key)+")";
+			strRatings += "(key=" + list.get(i).getName() + " : value=" + ratings.get(list.get(i).getName())+")";
 		}
 		strRatings += "}";
 		

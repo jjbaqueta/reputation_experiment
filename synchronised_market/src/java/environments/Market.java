@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import entities.model.Buyer;
 import entities.model.GeneralOrientedBuyer;
 import entities.model.Product;
+import entities.model.ReputationModel;
 import entities.model.Seller;
 import entities.services.BuyerFactory;
 import entities.services.MarketFacade;
@@ -49,6 +50,11 @@ public class Market extends Environment{
 			
 			// Creating products
 			availableProducts = ProductsFacade.generateCompleteListOfProducts();
+			
+			// Initializing the criteria used on reputation model 
+			ReputationModel.insertNewCriteria("price", Double.class);
+			ReputationModel.insertNewCriteria("quality", Double.class);
+			ReputationModel.insertNewCriteria("delivery", Integer.class);
 			
 			// Initializing sellers		
 			int j = 0;
