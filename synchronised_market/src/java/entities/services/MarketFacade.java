@@ -10,7 +10,7 @@ import entities.model.Seller;
 import environments.Market;
 import jason.asSyntax.Literal;
 
-public class MarketFacade {
+public abstract class MarketFacade {
 	
     private static AtomicInteger seqId = new AtomicInteger();	//id generator
 	

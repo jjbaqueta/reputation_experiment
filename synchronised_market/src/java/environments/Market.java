@@ -6,17 +6,18 @@ import java.util.logging.Logger;
 import entities.model.Buyer;
 import entities.model.GeneralOrientedBuyer;
 import entities.model.Product;
-import entities.model.ReputationModel;
 import entities.model.Seller;
 import entities.services.BuyerFactory;
 import entities.services.MarketFacade;
 import entities.services.ProductsFacade;
 import entities.services.SellerFactory;
 import enums.BuyerType;
+import enums.CriteriaType;
 import enums.SellerType;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
+import reputationModels.ReputationModel;
 
 public class Market extends Environment{
 	
@@ -30,7 +31,7 @@ public class Market extends Environment{
 	private static final int QUALITY_BUYERS = 0;
 	private static final int DELIVERY_BUYERS = 0;
 	private static final int GENERAL_BUYERS = 1;
-	private static final int ORDERS_BY_BUYER = 3;
+	private static final int ORDERS_BY_BUYER = 10;
 			
 	// Attributes;
 	private List<Product> availableProducts;
@@ -52,9 +53,9 @@ public class Market extends Environment{
 			availableProducts = ProductsFacade.generateCompleteListOfProducts();
 			
 			// Initializing the criteria used on reputation model 
-			ReputationModel.insertNewCriteria("price", Double.class);
-			ReputationModel.insertNewCriteria("quality", Double.class);
-			ReputationModel.insertNewCriteria("delivery", Integer.class);
+			ReputationModel.insertNewCriteria(CriteriaType.PRICE.getValue(), Double.class);
+			ReputationModel.insertNewCriteria(CriteriaType.QUALITY.getValue(), Double.class);
+			ReputationModel.insertNewCriteria(CriteriaType.DELIVERY.getValue(), Integer.class);
 			
 			// Initializing sellers		
 			int j = 0;

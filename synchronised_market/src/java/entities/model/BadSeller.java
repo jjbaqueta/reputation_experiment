@@ -28,9 +28,9 @@ public class BadSeller extends Seller{
 
 		if(probFactor < 7)
 		{
-			realPrice = offerAgreement.getPrice() * (1 + (rand.nextDouble() * rand.nextInt(2)));
-			realQuality = offerAgreement.getQuality() - (offerAgreement.getQuality() * (rand.nextDouble() * rand.nextInt(2)));
-			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + (rand.nextDouble() * rand.nextInt(2))));
+			realPrice = offerAgreement.getPrice() * (1 + (rand.nextDouble()));
+			realQuality = offerAgreement.getQuality() * (1 - (rand.nextDouble()));
+			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + (rand.nextDouble())));
 		}
 		
 		return Literal.parseLiteral("p(" + offerAgreement.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");

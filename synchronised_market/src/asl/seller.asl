@@ -31,7 +31,7 @@ find_product_by_name(P_name, Products)
 		find_product_by_name(P_name, Products)
    <-	.nth(0, Products, Offer);		 				// Get the first element of list
    		+proposal(CNPId, P_name, Offer); 				// Remember my proposal
-      	.send(Ag, tell, propose(CNPId, Offer));
+      	.send(Ag, tell, proposal(CNPId, Offer));
       	.print("Proposal sent to ", Ag, " {proposal: ", Offer, "}").
 
 @r1 +accept_proposal(CNPId)[source(Ag)]
@@ -43,7 +43,7 @@ find_product_by_name(P_name, Products)
 
 @r2 +reject_proposal(CNPId)[source(Ag)]
 	<-	.print("I lost CNP ",CNPId);
-		-proposal(CNPId,_,_). 							// Clear memory
+		!clear_memory(CNPId). 							// Clear memory
 
 +!delivery(CNPId, Buyer)
 	:	proposal(CNPId, P_name, Offer)
@@ -51,7 +51,14 @@ find_product_by_name(P_name, Products)
 		actions.sellerComputeRealDeliveryConditions(N, Offer, NewOffer);
 		.print("Original contract: ", Offer);
 		.print("New contract: ", NewOffer);
-		.send(Buyer, tell, delivered(CNPId, NewOffer)).
+		.send(Buyer, tell, delivered(CNPId, NewOffer));
+		!clear_memory(CNPId).
+		
++!clear_memory(CNPId)
+	<-	-accept_proposal(CNPId)[source(_)];
+		-reject_proposal(CNPId)[source(_)];
+		-cfp(CNPId,_)[source(_)];
+		-proposal(CNPId,_,_)[source(_)].
 	
 /******************** Plans of support **********************/
 

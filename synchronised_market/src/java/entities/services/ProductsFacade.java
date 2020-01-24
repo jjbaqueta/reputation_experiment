@@ -10,7 +10,7 @@ import entities.model.Product;
 import enums.ProductClassType;
 import enums.ProductDefault;
 
-public class ProductsFacade {
+public abstract class ProductsFacade {
 	
 	/*
 	 * This method generates a list that contains only tvs

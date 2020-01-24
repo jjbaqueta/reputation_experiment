@@ -5,12 +5,12 @@ import entities.model.Impression;
 import entities.model.Offer;
 import entities.model.Seller;
 import entities.services.MarketFacade;
+import enums.CriteriaType;
 import environments.Market;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
 public class buyerEvaluateContract extends DefaultInternalAction{
@@ -41,19 +41,8 @@ public class buyerEvaluateContract extends DefaultInternalAction{
 			
 			Offer proposal = Offer.parseProposal(args[2].toString(), seller.getName());
 			Offer contract = Offer.parseProposal(args[3].toString(), seller.getName());
-			
-			Impression imp = evaluateSeller(proposal, contract, buyer, seller);
-			
-			System.out.println(imp);
-			
-			System.out.println(imp.getImpressionAsLiteral().toString());
-			
-			System.out.println(args[0]);
-			System.out.println(args[1]);
-			System.out.println(args[2]);
-			System.out.println(args[3]);
-			
-			return un.unifies(Literal.parseLiteral("Rated"), args[4]);		
+					
+			return un.unifies(evaluateSeller(proposal, contract, buyer, seller).getImpressionAsLiteral(), args[4]);		
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{
@@ -76,14 +65,14 @@ public class buyerEvaluateContract extends DefaultInternalAction{
 	private Impression evaluateSeller(Offer proposal, Offer contract, Buyer buyer, Seller seller)
 	{
 		double priceDiscrepancy = contract.getPrice() / proposal.getPrice();
-		double qualityDiscrepancy = contract.getQuality() / proposal.getQuality();
+		double qualityDiscrepancy = proposal.getQuality() / contract.getQuality();
 		double deliveryDiscrepancy = (double) contract.getDeliveryTime() / proposal.getDeliveryTime();
 		
 		Impression impression = new Impression(buyer, seller, System.currentTimeMillis());
 		
-		impression.setRating("price", getScore(priceDiscrepancy));
-		impression.setRating("quality", getScore(qualityDiscrepancy));
-		impression.setRating("delivery", getScore(deliveryDiscrepancy));
+		impression.setRating(CriteriaType.PRICE.getValue(), getScore(priceDiscrepancy));
+		impression.setRating(CriteriaType.QUALITY.getValue(), getScore(qualityDiscrepancy));
+		impression.setRating(CriteriaType.DELIVERY.getValue(), getScore(deliveryDiscrepancy));
 		
 		return impression;
 	}

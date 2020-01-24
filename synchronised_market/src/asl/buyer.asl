@@ -2,8 +2,11 @@
 
 update_nb_offers(CNPId)
 	:- 	nb_participants(CNPId, NP) &				// Retrieves the number of participants for CNPId
-		.count(propose(CNPId,_)[source(_)], NO) &	// Counts the number of proposals received until now 
+		.count(proposal(CNPId,_)[source(_)], NO) &	// Counts the number of proposals received until now 
 		NP = NO.									// Updates the amount participants considering only those that sent a proposal
+
+check_impressions(Ag, Impressions)
+	:-	.findall(imp(Buyer, Ag, Time, Rating), imp(Buyer, Ag, Time, Rating), Impressions).
 
 /* Initial perceptions *************************************/
 
@@ -48,11 +51,14 @@ update_nb_offers(CNPId)
       	+cnp_state(CNPId, contract);
       	
       	// Loading all proposals sent
-      	.findall(offer(Offer, Ag), propose(CNPId, Offer)[source(Ag)], Offers);
+      	.findall(offer(Offer, Ag), proposal(CNPId, Offer)[source(Ag)], Offers);
       	
       	// Constraint: If exist at least one offer, the plan must continue
       	Offers \== []; 									
-      	.print("Offers recevied: ", Offers);     	
+      	.print("Offers recevied: ", Offers);
+      	
+      	 // Checking seller's reputation from my direct impressions and from witnesses' impressions
+      	!compute_reputation(Offers);    	
       	
       	// Take decision: evaluate all proposals and choose one seller to make a deal
       	.my_name(N);
@@ -67,11 +73,29 @@ update_nb_offers(CNPId)
 // Nothing to do, the current phase is not 'propose'
 @lc2 +!contract(_).
 
++!compute_reputation([offer(Offer, Ag)|T])
+	:	check_impressions(Ag, Impressions) & Impressions \== []
+	<-	actions.buyerCalculateReputation(Impressions, Reputation_profile);
+		.print(Reputation_profile);
+		-rep(Ag,_,_,_,_,_,_);
+		+Reputation_profile;
+		!compute_reputation(T).
+
++!compute_reputation([offer(Offer, Ag)|T])
+	:	check_impressions(Ag, Impressions) & Impressions == []
+	<-	!compute_reputation(T).
+
++!compute_reputation([]).
+
+-!compute_reputation([offer(Offer, Ag)|T])
+	<- .print("Failed - Inner operation presented error!!!!!").
+
 // The execution of the contract (plan: @lc1) has failed
 -!contract(CNPId)
 	<-	.print("CNP ",CNPId," has failed! - There were not proposals for request: ", CNPId);
 		-cnp_state(CNPId,_);
 		+cnp_state(CNPId, finished);
+		!clear_memory(CNPId);
 		buy(finished).
 
 // Announce to the winner
@@ -96,14 +120,21 @@ update_nb_offers(CNPId)
 		buy(finished).
 		
 +!evaluate(CNPId, NewOffer, Seller)
-	:	propose(CNPId, Offer)[source(Seller)]
+	:	proposal(CNPId, Offer)[source(Seller)]
 	<-	.my_name(N);
 		actions.buyerEvaluateContract(N, Seller, Offer, NewOffer, Rating);
-		//.send(Seller, tell, Rating);
-		//+rating(Seller, Rating)
-		.print("evaluating ...").
-//call rep model
+		.send(Seller, tell, Rating);
+		.df_search("initiator", Buyers);
+      	.send(Buyers, tell, Rating);
+		!clear_memory(CNPId);
+		.print("A new rating has sent to ", Seller).
 
++!clear_memory(CNPId)
+	<-	-winner(CNPId,_);
+		-nb_participants(CNPId,_);
+		-cnp_state(CNPId,_);
+		-delivered(CNPId,_)[source(_)];
+		-proposal(CNPId,_)[source(_)].
 
 /******************** Plans for debugging **********************/
 
