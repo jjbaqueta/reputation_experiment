@@ -26,11 +26,11 @@ public class BadSeller extends Seller{
 		 */
 		int probFactor = rand.nextInt(10);
 
-		if(probFactor < 7)
-		{
-			realPrice = offerAgreement.getPrice() * (1 + (rand.nextDouble()));
-			realQuality = offerAgreement.getQuality() * (1 - (rand.nextDouble()));
-			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + (rand.nextDouble())));
+		if(probFactor < 9)
+		{		
+			realPrice = offerAgreement.getPrice() * (1 + 0.8 * rand.nextDouble());
+			realQuality = offerAgreement.getQuality() * (1 - 0.4 * rand.nextDouble());
+			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + 0.8 * rand.nextDouble()));
 		}
 		
 		return Literal.parseLiteral("p(" + offerAgreement.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");

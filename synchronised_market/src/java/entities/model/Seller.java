@@ -23,9 +23,9 @@ public abstract class Seller extends SimpleAgent{
 		productsForSale = ProductsFacade.getSubsetFrom(amountOfItems, products);
 		
 		Random rand = new Random();
-		double priceFactor = 0.0 + (0.2 - 0.0) * rand.nextDouble();
-		double qualityFactor = 0.0 + (0.2 - 0.0) * rand.nextDouble();
-		double deliveryFactor = 0.0 + (0.2 - 0.0) * rand.nextDouble();
+		double priceFactor = 0.2 * rand.nextDouble();
+		double qualityFactor = 0.2 * rand.nextDouble();
+		double deliveryFactor = 0.2 * rand.nextDouble();
 		setMyConditionsOnProducts(priceFactor, qualityFactor, deliveryFactor);
 	}
 	

@@ -21,7 +21,7 @@ public abstract class ReGret extends ReputationModel{
 	 */
 	
 	// Intimate level of interactions (ITM) - limit to define the importance level of impressions
-	private static final double ITM = Market.buyers.length + Market.sellers.length;
+	private static final double ITM = Math.pow(Market.buyers.length, 2) * Market.sellers.length;
 	
 	/*
 	 * This method computes the subjective reputation for all evaluated criteria 
@@ -34,7 +34,7 @@ public abstract class ReGret extends ReputationModel{
 		double functionTj = getFunctionTj(impressions, currentTime);
 		double functionTi, rPrice = 0, rQuality = 0, rDelivery = 0;
 	
-		double[] reputations = new double[3];		// Stores reputation of each evaluated criterion 
+		double[] reputations = new double[criteria.size()];		// Stores reputation of each evaluated criterion 
 		
 		for(Impression imp : impressions)
 		{
@@ -64,7 +64,9 @@ public abstract class ReGret extends ReputationModel{
 		// Computing population average
 		double averagePrice = 0, averageQuality = 0, averageDelivery = 0;
 		
-		double[] reliabilities = new double[3];		// Stores reliability degree for each subjective reputation value 
+		double[] reliabilities = new double[criteria.size()];		// Stores reliability degree for each subjective reputation value
+		double[] deviations = computeDeviation(subjectiveRep, currentTime, impressions);
+		double ni = computeNi(impressions);
 		
 		for(Impression imp : impressions)
 		{
@@ -77,9 +79,9 @@ public abstract class ReGret extends ReputationModel{
 		averageDelivery /= impressions.size();
 		
 		// Computing reliability
-		reliabilities[0] = (1 - averagePrice) * computeNi(impressions) + averagePrice * computeDeviation(criteria.get(0).getName(), subjectiveRep[0], currentTime, impressions);
-		reliabilities[1] = (1 - averageQuality) * computeNi(impressions) + averageQuality * computeDeviation(criteria.get(1).getName(), subjectiveRep[1], currentTime, impressions);
-		reliabilities[2] = (1 - averageDelivery) * computeNi(impressions) + averageDelivery * computeDeviation(criteria.get(2).getName(), subjectiveRep[2], currentTime, impressions);
+		reliabilities[0] = (1 - averagePrice) * ni + averagePrice * deviations[0];
+		reliabilities[1] = (1 - averageQuality) * ni + averageQuality * deviations[1];
+		reliabilities[2] = (1 - averageDelivery) * ni + averageDelivery * deviations[2];
 		
 		return reliabilities;
 	}
@@ -109,25 +111,65 @@ public abstract class ReGret extends ReputationModel{
 	/*
 	 * This method computes the deviation of subjective reputation considering a given evaluation criterion (price, quality or delivery)
 	 * A deviation value near 0 indicates a high variability, in turn, close to 1 indicates a low variability (bigger reliability).
-	 * @param criterion Rating criterion selected (price, quality or delivery). 
 	 * @param subjectiveRep Subjective reputation from criterion selected.
 	 * @param currentTime Time instant used during the computation of subjective reputation.
 	 * @param impressions List of impressions considered to compute the subjective reputation.
 	 * @return Deviation of subjective reputation.
 	 */
-	private static double computeDeviation(String criterion, double subjectiveRep, long currentTime, List<Impression> impressions)
+	private static double[] computeStardardDeviation(double[] subjectiveRep, long currentTime, List<Impression> impressions)
 	{
-		double functionTj = getFunctionTj(impressions, currentTime);
-		double functionTi = 0, sum = 0;		
+		double functionTj = getFunctionTj(impressions, currentTime);	
+		double functionTi = 0, dPrice = 0, dQuality = 0, dDelivery = 0;		
 		
-		// Computing p(t, ti)
+		double[] deviations = new double[criteria.size()];		// Stores deviation values of each evaluated criterion
+		
+		// Computing standard deviation in relation to subjective reputation
 		for(Impression imp : impressions)
 		{
 			functionTi = (((double) imp.getTime()/currentTime)/functionTj);
-			sum += functionTi * Math.abs((double) imp.getRatings().get(criterion) - subjectiveRep);
+			
+			dPrice += functionTi * Math.pow(((double) imp.getRatings().get(criteria.get(0).getName()) - subjectiveRep[0]), 2);
+			dQuality += functionTi * Math.pow(((double) imp.getRatings().get(criteria.get(1).getName()) - subjectiveRep[1]), 2);
+			dDelivery += functionTi * Math.pow(((double) imp.getRatings().get(criteria.get(2).getName()) - subjectiveRep[2]), 2);
 		}
 		
-		return 1 - sum;		
+		deviations[0] = Math.sqrt(dPrice / impressions.size());
+		deviations[1] = Math.sqrt(dQuality / impressions.size());
+		deviations[2] = Math.sqrt(dDelivery / impressions.size());
+		
+		return deviations;		
+	}
+	
+	/*
+	 * This method computes the deviation of subjective reputation considering a given evaluation criterion (price, quality or delivery)
+	 * A deviation value near 0 indicates a high variability, in turn, close to 1 indicates a low variability (bigger reliability).
+	 * @param subjectiveRep Subjective reputation from criterion selected.
+	 * @param currentTime Time instant used during the computation of subjective reputation.
+	 * @param impressions List of impressions considered to compute the subjective reputation.
+	 * @return Deviation of subjective reputation.
+	 */
+	private static double[] computeDeviation(double[] subjectiveRep, long currentTime, List<Impression> impressions)
+	{
+		double functionTj = getFunctionTj(impressions, currentTime);	
+		double functionTi = 0, dPrice = 0, dQuality = 0, dDelivery = 0;		
+		
+		double[] deviations = new double[criteria.size()];		// Stores deviation values of each evaluated criterion
+		
+		// Computing standard deviation in relation to subjective reputation
+		for(Impression imp : impressions)
+		{
+			functionTi = (((double) imp.getTime()/currentTime)/functionTj);
+			
+			dPrice += functionTi * Math.abs((double) imp.getRatings().get(criteria.get(0).getName()) - subjectiveRep[0]);
+			dQuality += functionTi * Math.abs((double) imp.getRatings().get(criteria.get(1).getName()) - subjectiveRep[1]);
+			dDelivery += functionTi * Math.abs((double) imp.getRatings().get(criteria.get(2).getName()) - subjectiveRep[2]);
+		}
+		
+		deviations[0] = 1.0 - dPrice;
+		deviations[1] = 1.0 - dQuality;
+		deviations[2] = 1.0 - dDelivery;
+		
+		return deviations;		
 	}
 	
 	/*

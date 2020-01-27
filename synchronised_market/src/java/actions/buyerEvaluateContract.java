@@ -88,10 +88,10 @@ public class buyerEvaluateContract extends DefaultInternalAction{
 	private double getScore (double variation)
 	{	
 		if(variation <= 1)
-			return 10.0;					//maximum score
+			return 1;					//maximum score
 		else if(variation >= 2)
-			return 0;						//minimum score
+			return -1;						//minimum score
 		else
-			return -10 * (variation - 2);	//intermediate score (based on line equation)
+			return -2 * variation + 3;	//intermediate score (based on line equation)
 	}
 }

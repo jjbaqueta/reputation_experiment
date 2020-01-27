@@ -25,20 +25,15 @@ public class buyerCalculateReputation extends DefaultInternalAction{
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws JasonException 
 	{
 		try
-		{	
+		{				
 			// Translating impressions in Literal format to an Object list 
-			List<Impression> impressions = Impression.parseImpressionList(args[0].toString());
-			
-			for(Impression imp : impressions)
-			{
-				System.out.println(imp);
-			}
+			List<Impression> impressions = Impression.parseImpressionList(args[0].toString());			
 
 			// Getting current time.
 			long currentTime = System.currentTimeMillis();
 			
 			// Using ReGret model.
-			double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);
+			double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);					
 			double[] reliabilities = ReGret.computeReliability(reputations, currentTime, impressions);
 			
 			return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+

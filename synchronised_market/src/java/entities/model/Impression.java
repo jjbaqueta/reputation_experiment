@@ -73,16 +73,17 @@ public class Impression {
 			Buyer buyer = Market.buyers[MarketFacade.getBuyerIdFrom(informations[0])];
 			Seller seller = Market.sellers[MarketFacade.getSellerIdFrom(informations[1])];
 			time = Long.parseLong(informations[2]);
-			
+	
 			ratingPrice = Double.parseDouble(ratings[0]);
 			ratingQuality = Double.parseDouble(ratings[1]);
-			ratingDelivery = Integer.parseInt(ratings[2]);
+			ratingDelivery = Double.parseDouble(ratings[2]);
 			
 			Impression imp = new Impression(buyer, seller , time);
+			
 			imp.setRating(CriteriaType.PRICE.getValue(), ratingPrice);
 			imp.setRating(CriteriaType.QUALITY.getValue(), ratingQuality);
 			imp.setRating(CriteriaType.DELIVERY.getValue(), ratingDelivery);
-			
+				
 			impressions.add(imp);
 		}
 		

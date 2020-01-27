@@ -25,13 +25,13 @@ public class Market extends Environment{
 	private static final int BAD_SELLERS = 4;
 	private static final int GOOD_SELLERS = 0;
 	private static final int NEUTRAL_SELLERS = 0;
-	private static final int ITEMS_SOLD_BY_SELLER = 3;
+	private static final int ITEMS_SOLD_BY_SELLER = 10;
 
 	private static final int PRICE_BUYERS = 0;
 	private static final int QUALITY_BUYERS = 0;
 	private static final int DELIVERY_BUYERS = 0;
-	private static final int GENERAL_BUYERS = 1;
-	private static final int ORDERS_BY_BUYER = 10;
+	private static final int GENERAL_BUYERS = 4;
+	private static final int ORDERS_BY_BUYER = 5;
 			
 	// Attributes;
 	private List<Product> availableProducts;

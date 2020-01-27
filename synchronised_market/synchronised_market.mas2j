@@ -11,7 +11,7 @@ MAS synchronised_market {
 
 	agents:
 		
-		buyer #1;
+		buyer #4;
 		seller #4;
 
 	aslSourcePath:

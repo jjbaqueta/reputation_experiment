@@ -29,15 +29,15 @@ public class NeutralSeller extends Seller{
 		
 		if(probFactor == 0)
 		{
-			realPrice = offerAgreement.getPrice() * (1 + (rand.nextDouble()));
+			realPrice = offerAgreement.getPrice() * (1 + 0.8 * rand.nextDouble());
 		}
 		else if(probFactor == 1)
 		{
-			realQuality = offerAgreement.getQuality() - (offerAgreement.getQuality() * (rand.nextDouble()));
+			realQuality = offerAgreement.getQuality() * (1 - 0.4 * rand.nextDouble());
 		}
 		else if (probFactor == 2)
 		{
-			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + (rand.nextDouble())));
+			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + 0.8 * rand.nextDouble()));
 		}
 		
 		return Literal.parseLiteral("p(" + offerAgreement.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
