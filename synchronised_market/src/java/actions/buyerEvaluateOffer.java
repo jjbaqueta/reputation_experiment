@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 
 import entities.model.Buyer;
 import entities.model.Offer;
+import entities.model.Reputation;
 import entities.services.MarketFacade;
 import environments.Market;
 import jason.JasonException;
@@ -15,6 +16,7 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
 
 public class buyerEvaluateOffer extends DefaultInternalAction{
@@ -24,9 +26,10 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	/*
 	 * This method is used by buyer to decide if either accept or reject offers
 	 * The offer's data are passed from array args:
-	 * - args[0]: Contains a list with all offers received by buyer
-	 * - args[1]: Contains the buyer's name
-	 * - args[2]: Return the name of seller that presented the best offer 
+	 * - args[0]: Contains the buyer's name
+	 * - args[1]: Contains a list with all offers received by buyer
+	 * - args[2]: Contains a list with all available reputations 
+	 * - args[3]: Return the name of seller that presented the best offer 
 	 */
 	
 	@Override
@@ -34,12 +37,14 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	{
 		try
 		{	
+			List<Reputation> reputations = new ArrayList<Reputation>();
+			
 			// Get the index from buyer
-			int index = MarketFacade.getBuyerIdFrom(args[1].toString());
+			int index = MarketFacade.getBuyerIdFrom(args[0].toString());
 			Buyer buyer = Market.buyers[index];
 			
-			// Parsing the list of arguments : args[0]
-			String[] str_offers = args[0].toString().split("\\[offer\\(p\\(|\\),offer\\(p\\(|\\)\\]");
+			// Parsing the list of arguments : args[1]
+			String[] str_offers = args[1].toString().split("\\[offer\\(p\\(|\\),offer\\(p\\(|\\)\\]");
 			
 			String[] attributes;			
 			List<Offer> offers = new ArrayList<Offer>();		
@@ -54,10 +59,25 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 									 attributes[4])						// Seller's name
 			);}
 			
-			// Computing who is the best seller and return him
-			String seller = computeBestOfferByRelevance(offers, buyer.getPreferenceByPrice(), buyer.getPreferenceByQuality(), buyer.getPreferenceByDelivery()).getSeller();
+			// Parsing the list of arguments : args[2]
+			ListTerm repTermList = (ListTerm) args[2];
 			
-			return un.unifies(new Atom(seller), args[2]);	
+			if(!repTermList.isEmpty())
+			{
+				for(Term t : repTermList)
+				{
+					reputations.add(Reputation.parseReputation(t.toString()));
+				}
+			}
+
+			
+			// Computing who is the best seller and return him
+			String seller = computeBestOfferByRelevance(offers, reputations, buyer.getPreferenceByPrice(), buyer.getPreferenceByQuality(), buyer.getPreferenceByDelivery()).getSeller();
+
+			if(seller == null)
+				return un.unifies(new Atom("none"), args[3]);
+			else
+				return un.unifies(new Atom(seller), args[3]);	
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{
@@ -81,8 +101,19 @@ public class buyerEvaluateOffer extends DefaultInternalAction{
 	 * @param timeWeight Relevance factor of delivery time on best offer computation, 0.0 minimum, 1.0 maximum
 	 * @return best seller's name
 	 */
-	private Offer computeBestOfferByRelevance(List<Offer> offers, double priceWeight, double qualityWeight, double timeWeight)
+	private Offer computeBestOfferByRelevance(List<Offer> offers, List<Reputation> reputations, double priceWeight, double qualityWeight, double timeWeight)
 	{	
+		for(Reputation rep : reputations)
+		{
+			if(!rep.checkReputation(priceWeight, qualityWeight, timeWeight))
+			{
+				offers.removeIf(offer -> offer.getSeller().equals(rep.getAgent().getName()));
+			}
+		}
+		
+		if(offers.isEmpty())
+			return null;
+		
 		// Getting optimal values for each criteria
 		double minPrice = Collections.min(offers, (offer1, offer2) -> offer1.getPrice().compareTo(offer2.getPrice())).getPrice();
 		double maxQuality = Collections.max(offers, (offer1, offer2) -> offer1.getQuality().compareTo(offer2.getQuality())).getQuality();

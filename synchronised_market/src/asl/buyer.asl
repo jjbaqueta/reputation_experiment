@@ -53,6 +53,9 @@ check_impressions(Ag, Impressions)
       	// Loading all proposals sent
       	.findall(offer(Offer, Ag), proposal(CNPId, Offer)[source(Ag)], Offers);
       	
+      	// Loading all available reputations
+		.findall(rep(Ag, Rprice, Rquality, Rdelivery, Lprice, Lquality, Ldelivery), rep(Ag, Rprice, Rquality, Rdelivery, Lprice, Lquality, Ldelivery), Reputations);
+      	
       	// Constraint: If exist at least one offer, the plan must continue
       	Offers \== []; 									
       	.print("Offers recevied: ", Offers);
@@ -62,7 +65,10 @@ check_impressions(Ag, Impressions)
       	
       	// Take decision: evaluate all proposals and choose one seller to make a deal
       	.my_name(N);
-      	actions.buyerEvaluateOffer(Offers, N, Ag_winner);
+      	actions.buyerEvaluateOffer(N, Offers, Reputations, Ag_winner);
+      	
+      	Ag_winner \== none;
+      	
       	.print("The best offer came from: ", Ag_winner);
       	.print("Notifying participants about decision ...");
       	      	
