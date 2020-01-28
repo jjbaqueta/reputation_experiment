@@ -50,7 +50,7 @@ public abstract class Seller extends SimpleAgent{
 	 * The beliefs are defined according to following format: sell(product_name, product_price, product_quality, product_delivery_time)
 	 * @return a list of literals
 	 */
-	public List<Literal> getProductsAsLiteral()
+	public List<Literal> getProductsAsLiteralList()
 	{
 		List<Literal> beliefsList = new ArrayList<Literal>();
 		

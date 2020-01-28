@@ -102,7 +102,7 @@ check_impressions(Ag, Impressions)
 		-cnp_state(CNPId,_);
 		+cnp_state(CNPId, finished);
 		!clear_memory(CNPId);
-		buy(finished).
+		purchase(finished).
 
 // Announce to the winner
 +!announce_result(CNPId,[offer(_, Ag)|T], Ag_winner)
@@ -123,7 +123,7 @@ check_impressions(Ag, Impressions)
 	<-	!evaluate(CNPId, NewOffer, Ag);
 		-cnp_state(CNPId,_);
 		+cnp_state(CNPId, finished);
-		buy(finished).
+		purchase(finished).
 		
 +!evaluate(CNPId, NewOffer, Seller)
 	:	proposal(CNPId, Offer)[source(Seller)]
