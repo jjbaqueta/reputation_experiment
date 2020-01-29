@@ -2,24 +2,23 @@ package entities.model;
 
 import jason.asSemantics.Agent;
 
-public abstract class SimpleAgent extends Agent implements Comparable<SimpleAgent>{
-	String name;
+public abstract class SimpleAgent extends Agent implements Comparable<SimpleAgent>
+{
+	private String name;
 
-	public String getName() {
+	public String getName() 
+	{
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(String name) 
+	{
 		this.name = name;
 	}
 
 	@Override
-	public String toString() {
-		return "SimpleAgent [name=" + name + "]";
-	}
-
-	@Override
-	public int compareTo(SimpleAgent agent) {
+	public int compareTo(SimpleAgent agent) 
+	{
 		return name.compareTo(agent.getName());
 	}
 }

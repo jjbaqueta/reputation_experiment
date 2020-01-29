@@ -4,72 +4,89 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import entities.services.ProductsFacade;
 import jason.asSyntax.Literal;
 
-public abstract class Seller extends SimpleAgent{
-	
+public abstract class Seller extends SimpleAgent
+{
+	// Items for sale
 	private Set<Product> productsForSale;
 	
 	/*
 	 * This constructor initializes the list of products sold by seller
 	 * @param name Seller's name
-	 * @param amountOfItems An integer values that represents the number of products sold
-	 * @param products List of products available for sell
+	 * @param amountOfItems Integer value that represents the number of products that the seller can sell
+	 * @param availableProducts List of Products available to sell
 	 */
-	public Seller(String name, int amountOfItems, List<Product> products) {
+	public Seller(String name, int amountOfItems, List<Product> availableProducts) 
+	{
 		super.setName(name);
-		productsForSale = ProductsFacade.getSubsetFrom(amountOfItems, products);
+		productsForSale = ProductsFacade.getSubsetFrom(amountOfItems, availableProducts);
 		
+		// A seller may define his own sell conditions, up to 20% the more than products original conditions
 		Random rand = new Random();
 		double priceFactor = 0.2 * rand.nextDouble();
 		double qualityFactor = 0.2 * rand.nextDouble();
 		double deliveryFactor = 0.2 * rand.nextDouble();
-		setMyConditionsOnProducts(priceFactor, qualityFactor, deliveryFactor);
+		setMySellConditions(priceFactor, qualityFactor, deliveryFactor);
 	}
 	
 	/*
-	 * This method is used by seller to change the products attributes according to his own sell factors
-	 * @param priceFactor percentage increase/decrease of price attribute
-	 * @param priceQuality percentage increase/decrease of quality attribute
-	 * @param priceDelivery percentage increase/decrease of delivery time attribute
+	 * This method is an abstract method which must be implemented by all sellers that extend this class.
+	 * For more details about the types of sellers: @see{GoodSeller, NeutralSeller, BadSeller}
+	 * it is used to compute the price, quality and delivery penalties on a contracted service by a given buyer
+	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
+	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
-	private void setMyConditionsOnProducts(double priceFactor, double qualityFactor, double deliveryFactor)
+	public abstract Literal computeContractConditions(Offer agreedOffer);
+	
+	/*
+	 * This method is used by seller to change the products attributes according to his own sell conditions
+	 * @param priceFactor percentage of increase/decrease for the price attribute
+	 * @param priceQuality percentage of increase/decrease for the quality attribute
+	 * @param priceDelivery percentage of increase/decrease for the delivery time attribute
+	 */
+	private void setMySellConditions(double priceFactor, double qualityFactor, double deliveryFactor)
 	{
 		for(Product product : productsForSale)
 		{
-			product.setPrice(product.getPrice() * (1 + priceFactor));
-			product.setQuality(product.getQuality() - product.getQuality() * qualityFactor);
-			product.setDeliveryTime( (int) (product.getDeliveryTime() * (1 + deliveryFactor)));
+			product.setPrice(product.getPrice() * (1 + priceFactor));							//increase price
+			product.setQuality(product.getQuality() * (1 - qualityFactor));						//decrease quality
+			product.setDeliveryTime((int) (product.getDeliveryTime() * (1 + deliveryFactor)));	//increase delivery time
 		}
 	}
 	
 	/*
-	 * This method convert the set of product of seller into a list of literals (beliefs).
-	 * The beliefs are defined according to following format: sell(product_name, product_price, product_quality, product_delivery_time)
-	 * @return a list of literals
+	 * This method convert the set of products sold by seller into a sale list in literal format.
+	 * The literal form of an item from a sale list is: sell(product_name,product_price,product_quality,product_delivery)
+	 * @return a sale list with all sale items in literal format
 	 */
 	public List<Literal> getProductsAsLiteralList()
 	{
-		List<Literal> beliefsList = new ArrayList<Literal>();
+		List<Literal> saleList = new ArrayList<Literal>();
 		
-		for(Product p : productsForSale)
-		{
-			beliefsList.add(Literal.parseLiteral("sell("+p.getName().toLowerCase()+","+p.getPrice()+","+p.getQuality()+","+p.getDeliveryTime()+")"));
-		}
-		return beliefsList;
+		for(Product product : productsForSale)
+			saleList.add(Literal.parseLiteral("sell("+product.getName().toLowerCase()+","+product.getPrice()+","+product.getQuality()+","+product.getDeliveryTime()+")"));
+		
+		return saleList;
 	}
 	
 	public Set<Product> getProductsForSale()
 	{
 		return this.productsForSale;
 	}
+
+	@Override
+	public String toString() 
+	{
+		String strProducts = productsForSale.stream()
+                .map(p -> String.valueOf(p))
+                .collect(Collectors.joining(", "));
+		
+		return "Seller [name=" + this.getName() + ", products={" + strProducts + "}"; 
+	}
 	
-	/*
-	 * This method computes the penalties on a service contract
-	 * @param offerAgreement contract's terms defined between the buyer and seller
-	 * @return a belief about the product delivery conditions, which may or not be according to initial contract
-	 */
-	public abstract Literal computeRealDeliveryConditions(Offer offerAgreement);
+	
 }

@@ -34,7 +34,7 @@ public class sellerComputeRealDeliveryConditions extends DefaultInternalAction{
 			Offer offer = Offer.parseProposal(args[1].toString(), seller.getName());
 						
 			//Returns the result as Term
-			return un.unifies(seller.computeRealDeliveryConditions(offer), args[2]);		
+			return un.unifies(seller.computeContractConditions(offer), args[2]);		
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{

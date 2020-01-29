@@ -20,8 +20,8 @@ import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import reputationModels.ReputationModel;
 
-public class Market extends Environment {
-
+public class Market extends Environment 
+{
 	/** Constants (experiment parameters): */
 
 	private static final int BAD_SELLERS = 4;

@@ -5,34 +5,43 @@ import java.util.Random;
 
 import jason.asSyntax.Literal;
 
-public class BadSeller extends Seller{
-
-	public BadSeller(String name, int amountOfItems, List<Product> products) {
+/*
+ * This Class implements a BadSeller
+ * This kind of seller may change ALL conditions from initial contract that it was defined between a buyer and the seller
+ * See contract conditions implementation in: @see #computeContractConditions(Offer agreedOffer) 
+ */
+public class BadSeller extends Seller
+{
+	// Constructor
+	public BadSeller(String name, int amountOfItems, List<Product> products) 
+	{
 		super(name, amountOfItems, products);
 	}
 
+	/*
+	 * This method computes the probability of seller changes the conditions from initial contract
+	 * In this case, there is a probability of 80% of seller changes all of contract's conditions
+	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
+	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
+	 */
 	@Override
-	public Literal computeRealDeliveryConditions(Offer offerAgreement) {
-		
+	public Literal computeContractConditions(Offer agreedOffer) 
+	{
 		Random rand = new Random();
 		
-		double realPrice = offerAgreement.getPrice();
-		double realQuality = offerAgreement.getQuality();
-		int realDeliveryTime = offerAgreement.getDeliveryTime();
-		
-		/*
-		 * Compute the probability of change the initial contract
-		 * In this case, there is a probability of 80% of seller changes one or more agreement's conditions
-		 */
+		double realPrice = agreedOffer.getPrice();
+		double realQuality = agreedOffer.getQuality();
+		int realDeliveryTime = agreedOffer.getDeliveryTime();
+
 		int probFactor = rand.nextInt(10);
 
-		if(probFactor < 9)
+		if(probFactor < 8)
 		{		
-			realPrice = offerAgreement.getPrice() * (1 + 0.8 * rand.nextDouble());
-			realQuality = offerAgreement.getQuality() * (1 - 0.4 * rand.nextDouble());
-			realDeliveryTime = (int) (offerAgreement.getDeliveryTime() * (1 + 0.8 * rand.nextDouble()));
+			realPrice = agreedOffer.getPrice() * (1 + 0.5 * rand.nextDouble());							//up to 50% of increasing
+			realQuality = agreedOffer.getQuality() * (1 - 0.2 * rand.nextDouble());						//up to 20% of decreasing
+			realDeliveryTime = (int) (agreedOffer.getDeliveryTime() * (1 + 0.5 * rand.nextDouble()));	//up to 50% of increasing
 		}
 		
-		return Literal.parseLiteral("p(" + offerAgreement.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
+		return Literal.parseLiteral("p(" + agreedOffer.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
 	}
 }
