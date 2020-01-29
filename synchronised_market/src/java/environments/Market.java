@@ -74,13 +74,13 @@ public class Market extends Environment
 			int j = 0;
 
 			for (int i = 0; i < BAD_SELLERS; i++)
-				sellers[j++] = SellerFactory.getSeller(SellerType.BAD, "seller" + (j + 1), ITEMS_SOLD_BY_SELLER, availableProducts);
+				sellers[j++] = SellerFactory.getSeller(SellerType.BAD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
 
 			for (int i = 0; i < NEUTRAL_SELLERS; i++)
-				sellers[j++] = SellerFactory.getSeller(SellerType.NEUTRAL, "seller" + (j + 1), ITEMS_SOLD_BY_SELLER, availableProducts);
+				sellers[j++] = SellerFactory.getSeller(SellerType.NEUTRAL, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
 
 			for (int i = 0; i < GOOD_SELLERS; i++)
-				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + (j + 1), ITEMS_SOLD_BY_SELLER, availableProducts);
+				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
 
 			/** Initializing buyers: */
 			/*
@@ -95,16 +95,16 @@ public class Market extends Environment
 			j = 0;
 
 			for (int i = 0; i < PRICE_BUYERS; i++)
-				buyers[j++] = BuyerFactory.getBuyer(BuyerType.PRICE_ORIENTED, "buyer" + (j + 1), ORDERS_BY_BUYER, availableProducts);
+				buyers[j++] = BuyerFactory.getBuyer(BuyerType.PRICE_ORIENTED, "buyer" + j, ORDERS_BY_BUYER, availableProducts);
 
 			for (int i = 0; i < QUALITY_BUYERS; i++)
-				buyers[j++] = BuyerFactory.getBuyer(BuyerType.QUALITY_ORIENTED, "buyer" + (j + 1), ORDERS_BY_BUYER, availableProducts);
+				buyers[j++] = BuyerFactory.getBuyer(BuyerType.QUALITY_ORIENTED, "buyer" + j, ORDERS_BY_BUYER, availableProducts);
 
 			for (int i = 0; i < DELIVERY_BUYERS; i++)
-				buyers[j++] = BuyerFactory.getBuyer(BuyerType.DELIVERY_ORIENTED, "buyer" + (j + 1), ORDERS_BY_BUYER, availableProducts);
+				buyers[j++] = BuyerFactory.getBuyer(BuyerType.DELIVERY_ORIENTED, "buyer" + j, ORDERS_BY_BUYER, availableProducts);
 
 			for (int i = 0; i < GENERAL_BUYERS; i++)
-				buyers[j++] = new GeneralOrientedBuyer("buyer" + (j + 1), rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), ORDERS_BY_BUYER, availableProducts);
+				buyers[j++] = new GeneralOrientedBuyer("buyer" + j, rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), ORDERS_BY_BUYER, availableProducts);
 
 			/** Case exist only one agent of each type: */
 
@@ -165,7 +165,7 @@ public class Market extends Environment
 				addPercept(agName, Literal.parseLiteral("buy(nothing)"));
 				logger.info("The buyer: " + agName + " ended his purchases (-- CONCLUDED --)");
 			}
-		} 
+		}	
 		else 
 			logger.warning("executing: " + action + ", but not implemented!");
 

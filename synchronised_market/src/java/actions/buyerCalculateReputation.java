@@ -1,11 +1,13 @@
 package actions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import reputationModels.Impression;
@@ -25,31 +27,30 @@ public class buyerCalculateReputation extends DefaultInternalAction{
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws JasonException 
 	{
 		try
-		{				
+		{	
+			List<Impression> impressions = new ArrayList<Impression>();
+			
 			// Translating impressions in Literal format to an Object list 
-			List<Impression> impressions = Impression.parseImpressionList(args[0].toString());			
-
-			// Getting current time.
-			long currentTime = System.currentTimeMillis();
+			ListTerm impressionTermList = (ListTerm) args[0];
 			
-			// Using ReGret model.
-			double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);
+			for(Term t : impressionTermList)
+				impressions.add(Impression.parseImpression(t.toString()));
 			
-			for(double v : reputations)
+			if(!impressions.isEmpty())
 			{
-				System.out.println("REPUTATION ================ " + v);
+				// Getting current time.
+				long currentTime = System.currentTimeMillis();
+				
+				// Using ReGret model.
+				double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);
+				double[] reliabilities = ReGret.computeReliability(reputations, currentTime, impressions);
+				
+				return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+
+						","+reputations[0]+","+reputations[1]+","+reputations[2]+
+						","+reliabilities[0]+","+reliabilities[1]+","+reliabilities[2]+")"), args[1]);
 			}
-			
-			double[] reliabilities = ReGret.computeReliability(reputations, currentTime, impressions);
-			
-			for(double r : reliabilities)
-			{
-				System.out.println("RELIABILITIES ================ " + r);
-			}
-			
-			return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+
-					","+reputations[0]+","+reputations[1]+","+reputations[2]+
-					","+reliabilities[0]+","+reliabilities[1]+","+reliabilities[2]+")"), args[1]);	
+			else
+				return un.unifies(Literal.parseLiteral("rep(none)"), args[1]);
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{

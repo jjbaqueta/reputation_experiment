@@ -83,7 +83,10 @@ check_impressions(Ag, Impressions)
 +!compute_reputation([offer(Offer, Ag)|T])
 	:	check_impressions(Ag, Impressions) & Impressions \== []
 	<-	actions.buyerCalculateReputation(Impressions, Reputation_profile);
-		.print(Reputation_profile);
+//		.print(Reputation_profile);
+		
+		Repution_profile \== rep(none);
+		
 		-rep(Ag,_,_,_,_,_,_);
 		+Reputation_profile;
 		!compute_reputation(T).
@@ -95,7 +98,7 @@ check_impressions(Ag, Impressions)
 +!compute_reputation([]).
 
 -!compute_reputation([offer(Offer, Ag)|T])
-	<- .print("Failed - Inner operation presented error!!!!!").
+	<- .print("Failed - Inner operation presented error!!!!!; offer: ", Offer, " agent:", Ag).
 
 // The execution of the contract (plan: @lc1) has failed
 -!contract(CNPId)
@@ -133,8 +136,8 @@ check_impressions(Ag, Impressions)
 		.send(Seller, tell, Rating);
 		.df_search("initiator", Buyers);
       	.send(Buyers, tell, Rating);
-		!clear_memory(CNPId);
-		.print("A new impression has sent to ", Seller).
+		!clear_memory(CNPId).
+//		.print("A new impression has sent to ", Seller).
 
 +!clear_memory(CNPId)
 	<-	-winner(CNPId,_);

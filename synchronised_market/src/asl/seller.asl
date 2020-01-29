@@ -31,8 +31,8 @@ find_product_by_name(P_name, Products)
 		find_product_by_name(P_name, Products)
    <-	.nth(0, Products, Offer);		 				// Get the first element of list
    		+proposal(CNPId, P_name, Offer); 				// Remember my proposal
-      	.send(Ag, tell, proposal(CNPId, Offer));
-      	.print("Proposal sent to ", Ag, " {proposal: ", Offer, "}").
+      	.send(Ag, tell, proposal(CNPId, Offer)).
+//      	.print("Proposal sent to ", Ag, " {proposal: ", Offer, "}").
 
 @r1 +accept_proposal(CNPId)[source(Ag)]
 	:	proposal(CNPId, P_name, Offer)

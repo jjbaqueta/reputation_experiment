@@ -1,6 +1,5 @@
 package reputationModels;
 
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -54,42 +53,27 @@ public class Impression {
 	 * @param impList A string that represents the input literal
 	 * @return An List of impressions
 	 */
-	public static List<Impression> parseImpressionList(String impList)
-	{
-		List<Impression> impressions = new ArrayList<Impression>();
+	public static Impression parseImpression(String strImpression)
+	{	
+		String[] attributes = strImpression.split("imp\\(|\\,\\[|\\]\\)");	//output: [0]: buyer,agent,time; [1]: price,quality,delivery
+		String[] informations = attributes[1].split("\\,");					//output: [0]: buyer; [1]: agent; [2]: time
+		String[] ratings = attributes[2].split("\\,");						//output: [0]: price; [1]: quality; [2]: delivery
+
+		Buyer buyer = Market.buyers[MarketFacade.getBuyerIdFrom(informations[0])];
+		Seller seller = Market.sellers[MarketFacade.getSellerIdFrom(informations[1])];
+		long time = Long.parseLong(informations[2]);
 		
-		String[] strImpressions = impList.split("\\[imp\\(|\\)\\,imp\\(|\\)\\]");	//output: [0]:""; [1]: buyer,agent,time,[price,quality,delivery]; [2] : ...]>
-		String[] attributes;
-		String[] informations;
-		String[] ratings;
+		double ratingPrice = Double.parseDouble(ratings[0]);
+		double ratingQuality = Double.parseDouble(ratings[1]);
+		double ratingDelivery = Double.parseDouble(ratings[2]);
 		
-		long time;
-		double ratingPrice, ratingQuality, ratingDelivery;
+		Impression imp = new Impression(buyer, seller , time);
 		
-		for(int i = 1; i < strImpressions.length; i++)
-		{
-			attributes = strImpressions[i].split("\\,\\[|\\]");	//output: [0]: buyer,agent,time; [1]: price,quality,delivery
-			informations = attributes[0].split("\\,");			//output: [0]: buyer; [1]: agent; [2]: time
-			ratings = attributes[1].split("\\,");				//output: [0]: price; [1]: quality; [2]: delivery
-			
-			Buyer buyer = Market.buyers[MarketFacade.getBuyerIdFrom(informations[0])];
-			Seller seller = Market.sellers[MarketFacade.getSellerIdFrom(informations[1])];
-			time = Long.parseLong(informations[2]);
-	
-			ratingPrice = Double.parseDouble(ratings[0]);
-			ratingQuality = Double.parseDouble(ratings[1]);
-			ratingDelivery = Double.parseDouble(ratings[2]);
-			
-			Impression imp = new Impression(buyer, seller , time);
-			
-			imp.setRating(CriteriaType.PRICE.getValue(), ratingPrice);
-			imp.setRating(CriteriaType.QUALITY.getValue(), ratingQuality);
-			imp.setRating(CriteriaType.DELIVERY.getValue(), ratingDelivery);
-				
-			impressions.add(imp);
-		}
+		imp.setRating(CriteriaType.PRICE.getValue(), ratingPrice);
+		imp.setRating(CriteriaType.QUALITY.getValue(), ratingQuality);
+		imp.setRating(CriteriaType.DELIVERY.getValue(), ratingDelivery);
 		
-		return impressions;
+		return imp;
 	}
 	
 	/*
@@ -125,7 +109,7 @@ public class Impression {
 		}
 		strRatings += "}";
 		
-		return "Impression [appraiser=" + appraiser + ", appraised=" + appraised + ", time=" + time + strRatings + "]";
+		return "Impression [appraiser=" + appraiser.getName() + ", appraised=" + appraised.getName() + ", time=" + time + strRatings + "]";
 	}
 
 	
