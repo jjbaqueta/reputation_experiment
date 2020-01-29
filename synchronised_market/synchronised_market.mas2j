@@ -11,6 +11,9 @@ MAS synchronised_market {
 
 	agents:
 		
+//		buyer beliefBaseClass jason.bb.TextPersistentBB #4;
+//		seller beliefBaseClass jason.bb.TextPersistentBB #4;
+
 		buyer #4;
 		seller #4;
 

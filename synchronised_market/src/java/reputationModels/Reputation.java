@@ -1,14 +1,14 @@
-package entities.model;
+package reputationModels;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import entities.model.SimpleAgent;
 import entities.services.MarketFacade;
 import enums.CriteriaType;
 import environments.Market;
 import jason.asSyntax.Literal;
-import reputationModels.ReputationModel;
 
 public class Reputation {
 	private SimpleAgent agent;
@@ -68,30 +68,46 @@ public class Reputation {
 		return rep;
 	}
 	
-	public boolean checkReputation(double priceWeight, double qualityWeight, double timeWeight)
+	/*
+	 * This method checks the reputation of a given seller
+	 * @param priceWeight buyer's preference regarding to price
+	 * @paramqualityWeight buyer's preference regarding to quality
+	 * @param deliveryWeight buyer's preference regarding to weight
+	 * @return If seller's reputation is bigger than 0.5 return true, otherwise, return false
+	 */
+	public boolean checkReputation(double priceWeight, double qualityWeight, double deliveryWeight)
 	{
 		double repPrice = convertInterval(reputationRatings.get(CriteriaType.PRICE.getValue())) * convertInterval(reliabilityRatings.get(CriteriaType.PRICE.getValue()) * priceWeight);
 		double repQuality = convertInterval(reputationRatings.get(CriteriaType.QUALITY.getValue())) * convertInterval(reliabilityRatings.get(CriteriaType.QUALITY.getValue()) * qualityWeight);
-		double repDelivery = convertInterval(reputationRatings.get(CriteriaType.DELIVERY.getValue())) * convertInterval(reliabilityRatings.get(CriteriaType.DELIVERY.getValue()) * timeWeight);
+		double repDelivery = convertInterval(reputationRatings.get(CriteriaType.DELIVERY.getValue())) * convertInterval(reliabilityRatings.get(CriteriaType.DELIVERY.getValue()) * deliveryWeight);
 		
-		if(priceWeight == 1 && qualityWeight == 0 && timeWeight == 0)
+		if(priceWeight == 1 && qualityWeight == 0 && deliveryWeight == 0)
 			return repPrice >= 0.5 ? true : false;
-		else if(priceWeight == 0 && qualityWeight == 1 && timeWeight == 0)
+			
+		else if(priceWeight == 0 && qualityWeight == 1 && deliveryWeight == 0)
 			return repQuality >= 0.5 ? true : false;
-		else if(priceWeight == 0 && qualityWeight == 0 && timeWeight == 1)
+			
+		else if(priceWeight == 0 && qualityWeight == 0 && deliveryWeight == 1)
 			return repDelivery >= 0.5 ? true : false;
 			
-		else if(priceWeight != 0 && qualityWeight == 0 && timeWeight != 0)
+		else if(priceWeight != 0 && qualityWeight == 0 && deliveryWeight != 0)
 			return (repPrice + repDelivery)/2 >= 0.5 ? true : false;
-		else if(priceWeight == 0 && qualityWeight != 0 && timeWeight != 0)
+			
+		else if(priceWeight == 0 && qualityWeight != 0 && deliveryWeight != 0)
 			return (repQuality + repDelivery)/2 >= 0.5 ? true : false;
-		else if(priceWeight != 0 && qualityWeight != 0 && timeWeight == 0)
+			
+		else if(priceWeight != 0 && qualityWeight != 0 && deliveryWeight == 0)
 			return (repQuality + repPrice)/2 >= 0.5 ? true : false;
 		
 		else
 			return (repPrice + repQuality + repDelivery)/3 >= 0.5 ? true : false;		
 	}
 	
+	/*
+	 * This method translates a given value belonging to the numeric interval [-1, 1] to interval [0, 1]
+	 * @param x A Double value that represent the value within the numeric interval [-1, 1]
+	 * @return a double value within the numeric interval [0, 1] 
+	 */
 	private double convertInterval(double x)
 	{
 		if(x <= -1)

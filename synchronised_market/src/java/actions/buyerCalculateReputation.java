@@ -2,13 +2,13 @@ package actions;
 
 import java.util.List;
 
-import entities.model.Impression;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+import reputationModels.Impression;
 import reputationModels.ReGret;
 
 public class buyerCalculateReputation extends DefaultInternalAction{
@@ -33,8 +33,19 @@ public class buyerCalculateReputation extends DefaultInternalAction{
 			long currentTime = System.currentTimeMillis();
 			
 			// Using ReGret model.
-			double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);					
+			double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);
+			
+			for(double v : reputations)
+			{
+				System.out.println("REPUTATION ================ " + v);
+			}
+			
 			double[] reliabilities = ReGret.computeReliability(reputations, currentTime, impressions);
+			
+			for(double r : reliabilities)
+			{
+				System.out.println("RELIABILITIES ================ " + r);
+			}
 			
 			return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+
 					","+reputations[0]+","+reputations[1]+","+reputations[2]+

@@ -1,15 +1,17 @@
-package entities.model;
+package reputationModels;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import entities.model.Buyer;
+import entities.model.Seller;
+import entities.model.SimpleAgent;
 import entities.services.MarketFacade;
 import enums.CriteriaType;
 import environments.Market;
 import jason.asSyntax.Literal;
-import reputationModels.ReputationModel;
 
 public class Impression {
 	private SimpleAgent appraiser;

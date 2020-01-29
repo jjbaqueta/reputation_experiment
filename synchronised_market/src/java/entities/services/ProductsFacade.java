@@ -10,11 +10,14 @@ import entities.model.Product;
 import enums.ProductClassType;
 import enums.ProductDefault;
 
-public abstract class ProductsFacade {
-	
+/*
+ * This class implements a set of operations regarding to products
+ */
+public abstract class ProductsFacade 
+{	
 	/*
-	 * This method generates a list that contains only tvs
-	 * @return a list of tvs 
+	 * This method generates a list which contains only TVs
+	 * @return a list of TVs 
 	 */
 	public static List<Product> generateListOfTVs() throws Exception
 	{
@@ -30,7 +33,7 @@ public abstract class ProductsFacade {
 	}
 	
 	/*
-	 * This method generates a list that contains only notebooks
+	 * This method generates a list which contains only notebooks
 	 * @return a list of notebooks 
 	 */
 	public static List<Product> generateListOfNotebooks() throws Exception
@@ -47,8 +50,8 @@ public abstract class ProductsFacade {
 	}
 	
 	/*
-	 * This method generates a list that contains only desktops
-	 * @return a list of desktops 
+	 * This method generates a list which contains only desktop PCs
+	 * @return a list of desktop PCs 
 	 */
 	public static List<Product> generateListOfDesktops() throws Exception
 	{
@@ -64,7 +67,7 @@ public abstract class ProductsFacade {
 	}
 	
 	/*
-	 * This method generates a list that contains only smartphones
+	 * This method generates a list which contains only smartphones
 	 * @return a list of smartphones 
 	 */
 	public static List<Product> generateListOfSmartphones() throws Exception
@@ -81,7 +84,7 @@ public abstract class ProductsFacade {
 	}
 	
 	/*
-	 * This method generates a list that contains only tablets
+	 * This method generates a which that contains only tablets
 	 * @return a list of tablets 
 	 */
 	public static List<Product> generateListOfTablets() throws Exception
@@ -98,7 +101,7 @@ public abstract class ProductsFacade {
 	}
 	
 	/*
-	 * This method generates a list that contains all possible combinations of products
+	 * This method generates a list which contains all possible combinations of products
 	 * @return a complete list of products 
 	 */
 	public static List<Product> generateCompleteListOfProducts() throws Exception
@@ -139,14 +142,14 @@ public abstract class ProductsFacade {
 	}
 	
     /*
-     * This method generates a subset of products from a list of products 
-     * @param amountOfItems size of subset generated, the value this parameter must be at most equals to the size of list of products
-     * @param products list of products used to create the subset 
+     * This method generates a subset of products from available list of products 
+	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
+	 * @param availableProducts List of Products available to sell
      * @return A set of products of size equals the amountOfItems parameter
      */
-    public static Set<Product> getSubsetFrom(int amountOfItems, List<Product> products)
+    public static Set<Product> getSubsetFrom(int amountOfItems, List<Product> availableProducts)
     {	
-    	if(products.size() > amountOfItems)
+    	if(availableProducts.size() > amountOfItems)
     	{
     		Set<Product> productsForSell = new LinkedHashSet<Product>();
 	    	
@@ -154,7 +157,7 @@ public abstract class ProductsFacade {
 	    	
 	    	while(amountOfItems > 0)
 	    	{
-	    		if(productsForSell.add(products.get(rand.nextInt(products.size()))))
+	    		if(productsForSell.add(availableProducts.get(rand.nextInt(availableProducts.size()))))
 	    			amountOfItems--;
 	    	}	    		    	
 	    	return productsForSell;
@@ -163,16 +166,14 @@ public abstract class ProductsFacade {
     }
     
 	/*
-     * This method shows the products from a list
-     * @param products A list of Products
+     * This method shows a list of products
+     * @param products A list of products
      */
     public static void showProducts(List<Product> products)
     {
     	System.out.println("\n--------------------- PRODUCTS AVAILABLE (DEFAULT) --------------------\n");
     	
     	for(Product p : products)
-    	{
     		System.out.println("   -> " + p);
-    	}
     }
 }

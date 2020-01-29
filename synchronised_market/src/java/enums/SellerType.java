@@ -1,6 +1,10 @@
 package enums;
 
-public enum SellerType {
+/*
+ * This enum defines the types of buyers
+ */
+public enum SellerType 
+{
 	BAD,
 	NEUTRAL,
 	GOOD

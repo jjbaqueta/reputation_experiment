@@ -1,6 +1,11 @@
 package enums;
 
-public enum CriteriaType {
+/*
+ * This enum defines the criteria used on the reputation model
+ * If necessary more criteria can be added in this enum
+ */
+public enum CriteriaType 
+{
 	PRICE("price"),
 	QUALITY("quality"),
 	DELIVERY("delivery");

@@ -9,18 +9,35 @@ import entities.model.Product;
 import entities.model.Seller;
 import enums.SellerType;
 
-public class SellerFactory {
-	
-	public static Seller getSeller(SellerType type, String name, int amountOfItems, List<Product> products) throws Exception{
-		switch(type) {
-		case BAD:
-			return new BadSeller(name, amountOfItems, products);
-		case NEUTRAL:
-			return new NeutralSeller(name, amountOfItems, products);
-		case GOOD:
-			return new GoodSeller(name, amountOfItems, products);
-		default:
-			throw new Exception("Seller's type is not allowed");
+/*
+ * This class implements a factory of sellers
+ * This design pattern instances a new seller according to a type informed
+ * For more details about the types of sellers: @see{GoodSeller, NeutralSeller, BadSeller} 
+ */
+public class SellerFactory 
+{	/*
+	 * This method implements the factory of sellers
+	 * @param type An enum that specifies the type of buyer
+	 * @param name String value that represents the buyer's name
+	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
+	 * @param availableProducts List of Products available to sell
+	 * @return A Seller
+	 */
+	public static Seller getSeller(SellerType type, String name, int amountOfItems, List<Product> availableProducts) throws Exception
+	{
+		switch(type) 
+		{
+			case BAD:
+				return new BadSeller(name, amountOfItems, availableProducts);
+				
+			case NEUTRAL:
+				return new NeutralSeller(name, amountOfItems, availableProducts);
+				
+			case GOOD:
+				return new GoodSeller(name, amountOfItems, availableProducts);
+				
+			default:
+				throw new Exception("Seller's type is not allowed");
 		}
 	}
 }

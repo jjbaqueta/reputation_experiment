@@ -2,7 +2,6 @@ package reputationModels;
 
 import java.util.List;
 
-import entities.model.Impression;
 import environments.Market;
 
 /*
@@ -116,7 +115,7 @@ public abstract class ReGret extends ReputationModel{
 	 * @param impressions List of impressions considered to compute the subjective reputation.
 	 * @return Deviation of subjective reputation.
 	 */
-	private static double[] computeStardardDeviation(double[] subjectiveRep, long currentTime, List<Impression> impressions)
+	public static double[] computeStardardDeviation(double[] subjectiveRep, long currentTime, List<Impression> impressions)
 	{
 		double functionTj = getFunctionTj(impressions, currentTime);	
 		double functionTi = 0, dPrice = 0, dQuality = 0, dDelivery = 0;		

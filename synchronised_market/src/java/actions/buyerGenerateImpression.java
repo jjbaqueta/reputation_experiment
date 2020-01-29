@@ -1,7 +1,6 @@
 package actions;
 
 import entities.model.Buyer;
-import entities.model.Impression;
 import entities.model.Offer;
 import entities.model.Seller;
 import entities.services.MarketFacade;
@@ -12,19 +11,21 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
+import reputationModels.Impression;
 
-public class buyerEvaluateContract extends DefaultInternalAction{
+public class buyerGenerateImpression extends DefaultInternalAction{
 
 	private static final long serialVersionUID = 1L;
 
 	/*
-	 * This method may generate changes on conditions of a contract according to seller's type
-	 * The contract's data are passed from array args:
+	 * This method is used by a buyer to evaluate the contract conditions defined by a seller
+	 * The buyer checks if contract conditions are agreement with initial conditions and after that generates an impression about the seller
+	 * The informations to generate a impression are passed from the array args:
 	 * - args[0]: buyer's name
 	 * - args[1]: seller's name
-	 * - args[2]: original offer (proposal)
-	 * - args[3]: current offer (contract)
-	 * - args[4]: return the rating about the seller's behaviour 
+	 * - args[2]: original offer (initial contract conditions)
+	 * - args[3]: current offer (current contract conditions)
+	 * - args[4]: return a impression about the seller (rating) 
 	 */	
 	@Override
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws JasonException 

@@ -9,18 +9,34 @@ import entities.model.Product;
 import entities.model.QualityOrientedBuyer;
 import enums.BuyerType;
 
-public class BuyerFactory {
-	
-	public static Buyer getBuyer(BuyerType type, String buyerName, int amountOfItems, List<Product> products) throws Exception
+/*
+ * This class implements a factory of buyers
+ * This design pattern instances a new buyer according to a type informed
+ * For more details about the types of buyers: @see{PriceOrientedBuyer, QualityOrientedBuyer, DeliveryOrientedBuyer, GeneralOrientedBuyer} 
+ */
+public class BuyerFactory 
+{	
+	/*
+	 * This method implements the factory of buyers
+	 * @param type An enum that specifies the type of buyer
+	 * @param name String value that represents the buyer's name
+	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
+	 * @param availableProducts List of Products available to sell
+	 * @return A Buyer
+	 */
+	public static Buyer getBuyer(BuyerType type, String name, int amountOfItems, List<Product> availableProducts) throws Exception
 	{
 		switch(type)
 		{
 			case PRICE_ORIENTED:
-				return new PriceOrientedBuyer(buyerName, amountOfItems, products);
+				return new PriceOrientedBuyer(name, amountOfItems, availableProducts);
+				
 			case QUALITY_ORIENTED:
-				return new QualityOrientedBuyer(buyerName, amountOfItems, products);
+				return new QualityOrientedBuyer(name, amountOfItems, availableProducts);
+				
 			case DELIVERY_ORIENTED:
-				return new DeliveryOrientedBuyer(buyerName, amountOfItems, products);
+				return new DeliveryOrientedBuyer(name, amountOfItems, availableProducts);
+				
 			default:
 				throw new Exception("Buyer's type is not allowed");
 		}

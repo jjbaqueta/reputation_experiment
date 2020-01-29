@@ -5,11 +5,11 @@ import enums.ProductClassType;
 import enums.ProductDefault;
 
 /*
- * This class implements the Builder Design Pattern considering the Product entity
+ * This class implements the Design Pattern Builder considering the Product entity
  */
 
-public class ProductBuilder {
-	
+public class ProductBuilder 
+{
 	private String name;
 	private Double price;
 	private Double quality;
@@ -17,28 +17,28 @@ public class ProductBuilder {
 	
 	public ProductBuilder (String productName, ProductClassType productClass) throws Exception
 	{
-		ProductDefault defProd =  ProductDefault.valueOf(productName);
+		ProductDefault product =  ProductDefault.valueOf(productName);
 				
 		switch(productClass)
 		{
 			case ECONOMY:
-				orderEconomyVersionOf(defProd);
+				economyVersionOf(product);
 				break;
 			
 			case INTERMEDIATE:
-				orderIntermediateVersionOf(defProd);
+				orderIntermediateVersionOf(product);
 				break;
 				
 			case GOOD:
-				orderGoodVersionOf(defProd);
+				orderGoodVersionOf(product);
 				break;
 				
 			case GREAT:
-				orderGreatVersionOf(defProd);
+				orderGreatVersionOf(product);
 				break;
 				
 			case LUXURIOUS:
-				orderLuxuriousVersionOf(defProd);
+				orderLuxuriousVersionOf(product);
 				break;
 			
 			default:
@@ -47,11 +47,10 @@ public class ProductBuilder {
 	}
 	
 	/* 
-	 * This method specifies an economy version of product specified
-	 * Default values details: @see enums.ProductDefault
-	 * @param baseProduct the most simple version of the product (default version)
+	 * This method returns an economy version of product specified (specification of product to be built)
+	 * @param baseProduct an enum that represents the most simple version of the product (default version)
 	 */
-	private void orderEconomyVersionOf(ProductDefault baseProduct)
+	private void economyVersionOf(ProductDefault baseProduct)
 	{
 		this.name = baseProduct.name();
 		this.price = baseProduct.getPrice();
@@ -60,10 +59,8 @@ public class ProductBuilder {
 	}
 	
 	/*
-	 * This method specifies an intermediate version of product specified
-	 * Default values details: @see enums.ProductDefault
-	 * @param baseProduct the most simple version of the product (default version)
-	 * @return a specification of product to be built
+	 * This method returns an intermediate version of product specified (specification of product to be built)
+	 * @param baseProduct an enum that represents the most simple version of the product (default version)
 	 */
 	private void orderIntermediateVersionOf(ProductDefault baseProduct)
 	{
@@ -74,10 +71,8 @@ public class ProductBuilder {
 	}
 	
 	/*
-	 * This method specifies a good version of product specified
-	 * Default values details: @see enums.ProductDefault
-	 * @param baseProduct the most simple version of the product (default version)
-	 * @return a specification of product to be built
+	 * This method returns a good version of product specified (specification of product to be built)
+	 * @param baseProduct an enum that represents the most simple version of the product (default version)
 	 */
 	private void orderGoodVersionOf(ProductDefault baseProduct)
 	{
@@ -88,10 +83,8 @@ public class ProductBuilder {
 	}
 	
 	/*
-	 * This method specifies a great version of product specified
-	 * Default values details: @see enums.ProductDefault
-	 * @param baseProduct the most simple version of the product (default version)
-	 * @return a specification of product to be built
+	 * This method returns a great version of product specified (specification of product to be built)
+	 * @param baseProduct an enum that represents the most simple version of the product (default version)
 	 */
 	private void orderGreatVersionOf(ProductDefault baseProduct)
 	{
@@ -102,10 +95,8 @@ public class ProductBuilder {
 	}
 	
 	/*
-	 * This method specifies a luxurious version of product specified
-	 * Default values details: @see enums.ProductDefault
-	 * @param baseProduct the most simple version of the product (default version)
-	 * @return a specification of product to be built
+	 * This method returns a luxurious version of product specified (specification of product to be built)
+	 * @param baseProduct an enum that represents the most simple version of the product (default version)
 	 */
 	private void orderLuxuriousVersionOf(ProductDefault baseProduct)
 	{
@@ -116,7 +107,7 @@ public class ProductBuilder {
 	}
 	
 	/*
-	 * This method builds a product
+	 * This method builds a product specification
 	 * @return a product
 	 */
 	public Product build()

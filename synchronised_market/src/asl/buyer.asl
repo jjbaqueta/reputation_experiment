@@ -57,15 +57,16 @@ check_impressions(Ag, Impressions)
 		.findall(rep(Ag, Rprice, Rquality, Rdelivery, Lprice, Lquality, Ldelivery), rep(Ag, Rprice, Rquality, Rdelivery, Lprice, Lquality, Ldelivery), Reputations);
       	
       	// Constraint: If exist at least one offer, the plan must continue
-      	Offers \== []; 									
-      	.print("Offers recevied: ", Offers);
+      	Offers \== [];
+      	.length(Offers, N_offers) 									
+      	.print("Number of offers received: ", N_offers);
       	
       	 // Checking seller's reputation from my direct impressions and from witnesses' impressions
       	!compute_reputation(Offers);    	
       	
       	// Take decision: evaluate all proposals and choose one seller to make a deal
       	.my_name(N);
-      	actions.buyerEvaluateOffer(N, Offers, Reputations, Ag_winner);
+      	actions.buyerFindBestOffer(N, Offers, Reputations, Ag_winner);
       	
       	Ag_winner \== none;
       	
@@ -128,12 +129,12 @@ check_impressions(Ag, Impressions)
 +!evaluate(CNPId, NewOffer, Seller)
 	:	proposal(CNPId, Offer)[source(Seller)]
 	<-	.my_name(N);
-		actions.buyerEvaluateContract(N, Seller, Offer, NewOffer, Rating);
+		actions.buyerGenerateImpression(N, Seller, Offer, NewOffer, Rating);
 		.send(Seller, tell, Rating);
 		.df_search("initiator", Buyers);
       	.send(Buyers, tell, Rating);
 		!clear_memory(CNPId);
-		.print("A new rating has sent to ", Seller).
+		.print("A new impression has sent to ", Seller).
 
 +!clear_memory(CNPId)
 	<-	-winner(CNPId,_);

@@ -38,19 +38,17 @@ find_product_by_name(P_name, Products)
 	:	proposal(CNPId, P_name, Offer)
 	<-	.print("I won CNP, starting the delivery process ...", CNPId);
 		!delivery(CNPId, Ag).
-      
-      // Do the task and report to initiator - Send the product and fulfill the agreement
 
 @r2 +reject_proposal(CNPId)[source(Ag)]
-	<-	.print("I lost CNP ",CNPId);
+	<-	//.print("I lost CNP ",CNPId);
 		!clear_memory(CNPId). 							// Clear memory
 
 +!delivery(CNPId, Buyer)
 	:	proposal(CNPId, P_name, Offer)
 	<-	.my_name(N);
-		actions.sellerComputeRealDeliveryConditions(N, Offer, NewOffer);
-		.print("Original contract: ", Offer);
-		.print("New contract: ", NewOffer);
+		actions.sellerDefineDeliveryConditions(N, Offer, NewOffer);
+//		.print("Original contract: ", Offer);
+//		.print("New contract: ", NewOffer);
 		.send(Buyer, tell, delivered(CNPId, NewOffer));
 		!clear_memory(CNPId).
 		
