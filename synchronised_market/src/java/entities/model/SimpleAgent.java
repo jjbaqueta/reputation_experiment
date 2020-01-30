@@ -16,6 +16,11 @@ public abstract class SimpleAgent extends Agent implements Comparable<SimpleAgen
 		this.name = name;
 	}
 
+	public String getMyType()
+	{
+		return getClass().toString().split("\\.")[2];
+	}
+	
 	@Override
 	public int compareTo(SimpleAgent agent) 
 	{

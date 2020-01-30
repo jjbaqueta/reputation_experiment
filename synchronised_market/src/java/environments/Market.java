@@ -1,5 +1,9 @@
 package environments;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -24,8 +28,8 @@ public class Market extends Environment
 {
 	/** Constants (experiment parameters): */
 
-	private static final int BAD_SELLERS = 4;
-	private static final int GOOD_SELLERS = 0;
+	private static final int BAD_SELLERS = 3;
+	private static final int GOOD_SELLERS = 1;
 	private static final int NEUTRAL_SELLERS = 0;
 	private static final int ITEMS_SOLD_BY_SELLER = 10;
 
@@ -35,6 +39,10 @@ public class Market extends Environment
 	private static final int GENERAL_BUYERS = 4;
 	private static final int ORDERS_BY_BUYER = 5;
 
+	/** This file is used to save sale informations for posterior analysis */
+	
+	private File file = new File("sale.txt");
+	
 	/** Static attributes: */
 
 	public static Seller[] sellers = new Seller[BAD_SELLERS + NEUTRAL_SELLERS + GOOD_SELLERS];
@@ -52,6 +60,11 @@ public class Market extends Environment
 
 		try 
 		{
+			if(file.exists())
+			{
+				file.delete();
+			}
+			
 			// Defining the criteria used by model of reputation
 			ReputationModel.insertNewCriteria(CriteriaType.PRICE.getValue(), Double.class);
 			ReputationModel.insertNewCriteria(CriteriaType.QUALITY.getValue(), Double.class);
@@ -81,6 +94,12 @@ public class Market extends Environment
 
 			for (int i = 0; i < GOOD_SELLERS; i++)
 				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
+			
+			long time = System.currentTimeMillis();
+			
+			// Writing in the output file the initial sale state of each seller
+			for(Seller seller : sellers)
+				writeSaleStatus(seller, time);
 
 			/** Initializing buyers: */
 			/*
@@ -156,6 +175,8 @@ public class Market extends Environment
 		if (action.equals(Literal.parseLiteral("purchase(finished)"))) 
 		{
 			int index = MarketFacade.getBuyerIdFrom(agName);
+			buyers[index].increasePurchaseCompleteCount();
+			
 			clearPercepts(agName);
 
 			if (buyers[index].hasBuyingDesire()) 
@@ -164,8 +185,37 @@ public class Market extends Environment
 			{
 				addPercept(agName, Literal.parseLiteral("buy(nothing)"));
 				logger.info("The buyer: " + agName + " ended his purchases (-- CONCLUDED --)");
+				buyers[index].endActivities();
+				
+				if(MarketFacade.isMarketEnd())
+					showFinalReport();
 			}
-		}	
+		}
+		else if(action.equals(Literal.parseLiteral("purchase(completed)")))
+		{
+			int index = MarketFacade.getBuyerIdFrom(agName);
+			buyers[index].increasePurchaseCompleteCount();
+		}
+		else if (action.equals(Literal.parseLiteral("purchase(aborted)"))) 
+		{
+			int index = MarketFacade.getBuyerIdFrom(agName);
+			buyers[index].increasePurchaseAbortedCount();
+		}
+		else if(action.equals(Literal.parseLiteral("lost(sale)")))
+		{
+			int index = MarketFacade.getSellerIdFrom(agName);
+			sellers[index].increaseSaleLost();
+		}
+		else if(action.equals(Literal.parseLiteral("made(sale)")))
+		{	
+			int index = MarketFacade.getSellerIdFrom(agName);
+			sellers[index].increaseSaleMade();
+			
+			long time = System.currentTimeMillis();
+			
+			for(Seller seller : sellers)
+				writeSaleStatus(seller, time);
+		}
 		else 
 			logger.warning("executing: " + action + ", but not implemented!");
 
@@ -173,7 +223,44 @@ public class Market extends Environment
 	}
 
 	@Override
-	public void stop() {
+	public void stop() 
+	{
 		super.stop();
+	}
+	
+	/*
+	 * This method shows informations about buyers and sellers after the end of negotiations 
+	 */
+	public void showFinalReport() 
+	{	
+		System.out.println("\n---------------------- FINAL REPORT --------------------------");
+		System.out.println(" -> Number of purchase requests: " + ((PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER) + "\n");
+		
+		System.out.println("Informations about sellers:");
+		
+		for(Seller seller : sellers)
+			System.out.println(" ->" + seller.getName() +"("+ seller.getMyType() +")" + " {sales made: " + seller.getSaleMadeCount() + "; sales lost: " + seller.getSaleLostCount() + "}");
+		
+		System.out.println("\nInformations about buyers:");
+		
+		for(Buyer buyer : buyers)
+			System.out.println(" ->" + buyer.getName() +"("+ buyer.getMyType() +")" + " {purchases completed: " + buyer.getPurchaseCompleteCount() + "; purchases aborted: " + buyer.getPurchaseAbortedCount() + "}");
+	}
+	
+	/*
+	 * This method writes in the output file 'sales.txt' the current sale state of each seller
+	 * @param seller represents the seller who will be write his sale state
+	 * @param time current time, it is used to sort the writing events
+	 */
+	public void writeSaleStatus(Seller seller, long time)
+	{
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+			writer.append(seller.getName() + "," + seller.getMyType() + "," + time + "," + seller.getSaleMadeCount() +"\n");			     
+		    writer.close();
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

@@ -40,8 +40,8 @@ public class buyerGenerateImpression extends DefaultInternalAction{
 			index = MarketFacade.getSellerIdFrom(args[1].toString());
 			Seller seller = Market.sellers[index];
 			
-			Offer proposal = Offer.parseProposal(args[2].toString(), seller.getName());
-			Offer contract = Offer.parseProposal(args[3].toString(), seller.getName());
+			Offer proposal = Offer.parseProposal(args[2].toString(), seller);
+			Offer contract = Offer.parseProposal(args[3].toString(), seller);
 					
 			return un.unifies(evaluateSeller(proposal, contract, buyer, seller).getImpressionAsLiteral(), args[4]);		
 		}

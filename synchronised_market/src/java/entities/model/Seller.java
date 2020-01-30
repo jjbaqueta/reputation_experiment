@@ -11,8 +11,9 @@ import jason.asSyntax.Literal;
 
 public abstract class Seller extends SimpleAgent
 {
-	// Items for sale
-	private Set<Product> productsForSale;
+	private Set<Product> productsForSale;	// Items for sale
+	private int saleMadeCount;				// Number of sale that were performed
+	private int saleLostCount;				// Number of sale that were lost
 	
 	/*
 	 * This constructor initializes the list of products sold by seller
@@ -24,6 +25,8 @@ public abstract class Seller extends SimpleAgent
 	{
 		super.setName(name);
 		productsForSale = ProductsFacade.getSubsetFrom(amountOfItems, availableProducts);
+		saleMadeCount = 0;
+		saleLostCount = 0;
 		
 		// A seller may define his own sell conditions, up to 20% the more than products original conditions
 		Random rand = new Random();
@@ -77,6 +80,26 @@ public abstract class Seller extends SimpleAgent
 	{
 		return this.productsForSale;
 	}
+	
+	public int getSaleMadeCount() 
+	{
+		return saleMadeCount;
+	}
+
+	public void increaseSaleMade() 
+	{
+		this.saleMadeCount++;
+	}
+
+	public int getSaleLostCount() 
+	{
+		return saleLostCount;
+	}
+
+	public void increaseSaleLost() 
+	{
+		this.saleLostCount++;
+	}
 
 	@Override
 	public String toString() 
@@ -87,6 +110,4 @@ public abstract class Seller extends SimpleAgent
 		
 		return "Seller [name=" + this.getName() + ", products={" + strProducts + "}"; 
 	}
-	
-	
 }

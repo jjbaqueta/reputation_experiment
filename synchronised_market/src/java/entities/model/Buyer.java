@@ -21,6 +21,11 @@ public abstract class Buyer extends SimpleAgent
 	private double preferenceByQuality;
 	private double preferenceByDelivery;
 	
+	private int purchaseCompleteCount;
+	private int purchaseAbortedCount;
+	
+	private boolean buying;
+	
 	/*
 	 * Constructor
 	 * @param name String value that represents the buyer's name
@@ -32,6 +37,11 @@ public abstract class Buyer extends SimpleAgent
 		super.setName(name);
 		productsToBuy = new Stack<Literal>();
 		addItemsToBuy(amountOfItems, availableProducts);
+		
+		purchaseCompleteCount = 0;
+		purchaseAbortedCount = 0;
+		
+		buying = true;
 	}
 	
 	/*
@@ -111,6 +121,36 @@ public abstract class Buyer extends SimpleAgent
 		return productsToBuy;
 	}
 	
+	public int getPurchaseCompleteCount() 
+	{
+		return purchaseCompleteCount;
+	}
+
+	public void increasePurchaseCompleteCount() 
+	{
+		this.purchaseCompleteCount++;
+	}
+
+	public int getPurchaseAbortedCount() 
+	{
+		return purchaseAbortedCount;
+	}
+
+	public void increasePurchaseAbortedCount() 
+	{
+		this.purchaseAbortedCount++;
+	}
+	
+	public boolean isBuying() 
+	{
+		return buying;
+	}
+
+	public void endActivities() 
+	{
+		this.buying = false;
+	}
+
 	/*
 	 * This method returns the buyer's preferences in literal format
 	 * The literal form of the preferences is: pref(price_preference,quality_preference,delivery_preference)

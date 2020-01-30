@@ -1,5 +1,8 @@
 package entities.model;
 
+import entities.services.MarketFacade;
+import environments.Market;
+
 /*
  * This class implements an Offer
  * Sellers can offer products to buyers, it turn, buyers can accept an offer according to his preferences
@@ -10,9 +13,9 @@ public class Offer
 	private Double price;			// Criteria 1: product's price
 	private Double quality;			// Criteria 2: product's quality
 	private Integer deliveryTime;	// Criteria 3: delivery time
-	private String seller;			// Who sells the product
+	private Seller seller;			// Who sells the product
 	
-	public Offer(String product, Double price, Double quality, Integer deleveryTime, String seller) 
+	public Offer(String product, Double price, Double quality, Integer deleveryTime, Seller seller) 
 	{		
 		this.product = product;
 		this.price = price;
@@ -41,7 +44,7 @@ public class Offer
 		return deliveryTime;
 	}
 
-	public String getSeller() 
+	public Seller getSeller() 
 	{
 		return seller;
 	}
@@ -60,9 +63,9 @@ public class Offer
 		Double price =  Double.parseDouble(attributes[2]);
 		Double quality = Double.parseDouble(attributes[3]);
 		Integer delivery = Integer.parseInt(attributes[4]);
-		String sellerName = attributes[5];
+		Seller seller = Market.sellers[MarketFacade.getSellerIdFrom(attributes[5])];
 		
-		return new Offer(productName, price, quality, delivery, sellerName);
+		return new Offer(productName, price, quality, delivery, seller);
 	}	
 	
 	/*
@@ -72,7 +75,7 @@ public class Offer
 	 * @param sellerName A string that represents the seller's name
 	 * @return An Offer
 	 */
-	public static Offer parseProposal(String strProduct, String sellerName)
+	public static Offer parseProposal(String strProduct, Seller seller)
 	{
 		String[] attributes = strProduct.split("p\\(|\\)")[1].split("\\,");
 		
@@ -81,13 +84,13 @@ public class Offer
 		double pQuality = Double.parseDouble(attributes[2]);
 		int pDelivery = Integer.parseInt(attributes[3]);
 		
-		return new Offer(pName, pPrice, pQuality, pDelivery, sellerName);
+		return new Offer(pName, pPrice, pQuality, pDelivery, seller);
 	}
 	
 	@Override
 	public String toString() 
 	{
 		return "Offer [product=" + product + ", price=" + price + ", quality=" + quality + ", deleveryTime="
-				+ deliveryTime + ", seller=" + seller + "]";
+				+ deliveryTime + ", seller=" + seller.getName() + "]";
 	}
 }

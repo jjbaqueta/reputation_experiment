@@ -34,7 +34,7 @@ public class sellerDefineDeliveryConditions extends DefaultInternalAction
 			Seller seller = Market.sellers[index];
 			
 			// Parsing the offer received
-			Offer offer = Offer.parseProposal(args[1].toString(), seller.getName());
+			Offer offer = Offer.parseProposal(args[1].toString(), seller);
 						
 			//Returns the result as Term
 			return un.unifies(seller.computeContractConditions(offer), args[2]);		

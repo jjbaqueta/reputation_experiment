@@ -37,10 +37,11 @@ find_product_by_name(P_name, Products)
 @r1 +accept_proposal(CNPId)[source(Ag)]
 	:	proposal(CNPId, P_name, Offer)
 	<-	.print("I won CNP, starting the delivery process ...", CNPId);
+		made(sale);
 		!delivery(CNPId, Ag).
 
 @r2 +reject_proposal(CNPId)[source(Ag)]
-	<-	//.print("I lost CNP ",CNPId);
+	<-	lost(sale);
 		!clear_memory(CNPId). 							// Clear memory
 
 +!delivery(CNPId, Buyer)

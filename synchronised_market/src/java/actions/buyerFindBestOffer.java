@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 
 import entities.model.Buyer;
 import entities.model.Offer;
+import entities.model.Seller;
 import entities.services.MarketFacade;
 import environments.Market;
 import jason.JasonException;
@@ -69,12 +70,12 @@ public class buyerFindBestOffer extends DefaultInternalAction
 			}
 
 			// Computing who is the best seller and return him
-			String sellerName = computeBestOfferByRelevance(offers, reputations, buyer.getPreferenceByPrice(), buyer.getPreferenceByQuality(), buyer.getPreferenceByDelivery()).getSeller();
+			Seller bestSeller = computeBestOfferByRelevance(offers, reputations, buyer.getPreferenceByPrice(), buyer.getPreferenceByQuality(), buyer.getPreferenceByDelivery()).getSeller();
 
-			if(sellerName == null)
+			if(bestSeller == null)
 				return un.unifies(new Atom("none"), args[3]);
 			else
-				return un.unifies(new Atom(sellerName), args[3]);	
+				return un.unifies(new Atom(bestSeller.getName()), args[3]);
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{

@@ -86,4 +86,20 @@ public abstract class MarketFacade
 		else
 			return Integer.parseInt(name.split("seller")[1]) - 1;
 	}
+	
+	/*
+	 * This method checks if there is some buyer in buying process
+	 * If all buyers ends their purchases, the market can close
+	 * @return false there is at least one buyer buying, otherwise return true
+	 */
+	public static boolean isMarketEnd()
+	{	
+		for(Buyer buyer : Market.buyers)
+		{
+			if(buyer.isBuying())
+				return false;
+		}
+		
+		return true;
+	}
 }
