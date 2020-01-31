@@ -1,6 +1,6 @@
 /*
  * This project uses the Contract Net Protocol (CNP) 
- * The CNP is the base element to communication among agents
+ * The CNP is used to communication among agents
  */
 
 MAS synchronised_market {
@@ -10,13 +10,8 @@ MAS synchronised_market {
 	environment: environments.Market
 
 	agents:
+		manager;
 		
-//		buyer beliefBaseClass jason.bb.TextPersistentBB #4;
-//		seller beliefBaseClass jason.bb.TextPersistentBB #4;
-
-		buyer #4;
-		seller #4;
-
 	aslSourcePath:
 		"src/asl";
 }

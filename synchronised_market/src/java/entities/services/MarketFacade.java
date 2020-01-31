@@ -1,5 +1,6 @@
 package entities.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -85,6 +86,34 @@ public abstract class MarketFacade
 			return 0;
 		else
 			return Integer.parseInt(name.split("seller")[1]) - 1;
+	}
+	
+	/*
+	 * This methods is used to get the name of all sellers
+	 * @return sellers names list
+	 */
+	public static List<String> getSellersNamesList()
+	{
+		List<String> names = new ArrayList<String>();
+		
+		for(Seller seller : Market.sellers)
+			names.add(seller.getName());
+		
+		return names;
+	}
+	
+	/*
+	 * This methods is used to get the name of all buyers
+	 * @return buyers names list
+	 */
+	public static List<String> getBuyersNamesList()
+	{
+		List<String> names = new ArrayList<String>();
+		
+		for(Buyer buyer : Market.buyers)
+			names.add(buyer.getName());
+		
+		return names;
 	}
 	
 	/*

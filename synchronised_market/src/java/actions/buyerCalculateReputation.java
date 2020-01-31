@@ -45,9 +45,9 @@ public class buyerCalculateReputation extends DefaultInternalAction{
 				double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);
 				double[] reliabilities = ReGret.computeReliability(reputations, currentTime, impressions);
 				
-				return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+
-						","+reputations[0]+","+reputations[1]+","+reputations[2]+
-						","+reliabilities[0]+","+reliabilities[1]+","+reliabilities[2]+")"), args[1]);
+				return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+","+currentTime+","
+				+reputations[0]+","+reputations[1]+","+reputations[2]+","
+				+reliabilities[0]+","+reliabilities[1]+","+reliabilities[2]+")"), args[1]);
 			}
 			else
 				return un.unifies(Literal.parseLiteral("rep(none)"), args[1]);

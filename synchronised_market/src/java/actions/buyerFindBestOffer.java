@@ -105,12 +105,10 @@ public class buyerFindBestOffer extends DefaultInternalAction
 		for(Reputation rep : reputations)
 		{
 			if(!rep.checkReputation(priceWeight, qualityWeight, timeWeight))
-			{
-				offers.removeIf(offer -> offer.getSeller().equals(rep.getAgent().getName()));
-			}
+				offers.removeIf(offer -> offer.getSeller().getName().equals(rep.getAgent().getName()));
 		}
 		
-		// Case it there is not offers (all seller were removed due to their low reputation)
+		// If there are not offers (all seller were removed due to their low reputation)
 		if(offers.isEmpty())
 			return null;
 		
@@ -123,7 +121,7 @@ public class buyerFindBestOffer extends DefaultInternalAction
 		double[] ratings = new double[offers.size()]; 
 		Arrays.fill(ratings, 0);
 		
-		// Normalization and computation of ratings of offers (from weighted average)
+		// Normalization and computation of the ratings (based on weighted average)
 		for(int i = 0; i < offers.size(); i++)
 		{
 			ratings[i] += (offers.get(i).getPrice() / minPrice) * (priceWeight);

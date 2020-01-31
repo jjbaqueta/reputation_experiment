@@ -28,18 +28,18 @@ public class Market extends Environment
 {
 	/** Constants (experiment parameters): */
 
-	private static final int BAD_SELLERS = 3;
+	private static final int BAD_SELLERS = 1;
 	private static final int GOOD_SELLERS = 1;
 	private static final int NEUTRAL_SELLERS = 0;
-	private static final int ITEMS_SOLD_BY_SELLER = 10;
+	private static final int ITEMS_SOLD_BY_SELLER = 3;	//at most 25
 
-	private static final int PRICE_BUYERS = 0;
-	private static final int QUALITY_BUYERS = 0;
-	private static final int DELIVERY_BUYERS = 0;
-	private static final int GENERAL_BUYERS = 4;
+	private static final int PRICE_BUYERS = 5;
+	private static final int QUALITY_BUYERS = 5;
+	private static final int DELIVERY_BUYERS = 5;
+	private static final int GENERAL_BUYERS = 5;
 	private static final int ORDERS_BY_BUYER = 5;
 
-	/** This file is used to save sale informations for posterior analysis */
+	/** This file is used to save the sale informations for posterior analysis */
 	
 	private File file = new File("sale.txt");
 	
@@ -59,11 +59,11 @@ public class Market extends Environment
 		super.init(args);
 
 		try 
-		{
+		{	
+			// Deleting the 'sale.txt' file, if it exists
 			if(file.exists())
-			{
 				file.delete();
-			}
+
 			
 			// Defining the criteria used by model of reputation
 			ReputationModel.insertNewCriteria(CriteriaType.PRICE.getValue(), Double.class);
@@ -71,7 +71,8 @@ public class Market extends Environment
 			ReputationModel.insertNewCriteria(CriteriaType.DELIVERY.getValue(), Integer.class);
 
 			// Creating a complete list of products
-			availableProducts = ProductsFacade.generateCompleteListOfProducts();
+//			availableProducts = ProductsFacade.generateCompleteListOfProducts();
+			availableProducts = ProductsFacade.generateListOfTVs();
 
 			// Creating a logger to show messages
 			logger = Logger.getLogger("Log messages for Class: " + Market.class.getName());
@@ -150,7 +151,11 @@ public class Market extends Environment
 
 	//	Setting the initial perceptions
 	public void updatePercepts() 
-	{
+	{	
+		clearPercepts("manager");
+		addPercept("manager", Literal.parseLiteral("create(sellers)"));
+		addPercept("manager", Literal.parseLiteral("create(buyers)"));
+		
 		for (Buyer buyer : buyers) 
 		{
 			clearPercepts(buyer.getName());
@@ -165,7 +170,7 @@ public class Market extends Environment
 				addPercept(seller.getName(), product);
 		}
 	}
-
+	
 	// Defining the simple actions that may be performed by agents
 	@Override
 	public boolean executeAction(String agName, Structure action) 
@@ -185,11 +190,13 @@ public class Market extends Environment
 			{
 				addPercept(agName, Literal.parseLiteral("buy(nothing)"));
 				logger.info("The buyer: " + agName + " ended his purchases (-- CONCLUDED --)");
-				buyers[index].endActivities();
-				
-				if(MarketFacade.isMarketEnd())
-					showFinalReport();
+				buyers[index].endActivities();		
 			}
+		}
+		else if(action.equals(Literal.parseLiteral("check_status(end)")))
+		{
+			if(MarketFacade.isMarketEnd())
+				showFinalReport();
 		}
 		else if(action.equals(Literal.parseLiteral("purchase(completed)")))
 		{

@@ -22,12 +22,15 @@ public abstract class ProductsFacade
 	public static List<Product> generateListOfTVs() throws Exception
 	{
 		List<Product> products = new ArrayList<Product>();
-			
-		products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
-		products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.INTERMEDIATE).build());
-		products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.GOOD).build());
-		products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.GREAT).build());
-		products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.LUXURIOUS).build());
+		
+		for(int i = 0; i < 5; i++)
+		{
+			products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+			products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.INTERMEDIATE).build());
+			products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.GOOD).build());
+			products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.GREAT).build());
+			products.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.LUXURIOUS).build());
+		}
 			
 		return products;
 	}
@@ -39,12 +42,15 @@ public abstract class ProductsFacade
 	public static List<Product> generateListOfNotebooks() throws Exception
 	{
 		List<Product> products = new ArrayList<Product>();
-			
-		products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
-		products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.INTERMEDIATE).build());
-		products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.GOOD).build());
-		products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.GREAT).build());
-		products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.LUXURIOUS).build());
+		
+		for(int i = 0; i < 5; i++)
+		{	
+			products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+			products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.INTERMEDIATE).build());
+			products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.GOOD).build());
+			products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.GREAT).build());
+			products.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.LUXURIOUS).build());
+		}
 			
 		return products;
 	}
@@ -56,12 +62,15 @@ public abstract class ProductsFacade
 	public static List<Product> generateListOfDesktops() throws Exception
 	{
 		List<Product> products = new ArrayList<Product>();
-			
-		products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
-		products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.INTERMEDIATE).build());
-		products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.GOOD).build());
-		products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.GREAT).build());
-		products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.LUXURIOUS).build());
+		
+		for(int i = 0; i < 5; i++)
+		{
+			products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
+			products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.INTERMEDIATE).build());
+			products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.GOOD).build());
+			products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.GREAT).build());
+			products.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.LUXURIOUS).build());
+		}
 			
 		return products;
 	}
@@ -73,13 +82,16 @@ public abstract class ProductsFacade
 	public static List<Product> generateListOfSmartphones() throws Exception
 	{
 		List<Product> products = new ArrayList<Product>();
-			
-		products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.ECONOMY).build());
-		products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.INTERMEDIATE).build());
-		products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.GOOD).build());
-		products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.GREAT).build());
-		products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.LUXURIOUS).build());
-			
+		
+		for(int i = 0; i < 5; i++)
+		{
+			products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.ECONOMY).build());
+			products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.INTERMEDIATE).build());
+			products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.GOOD).build());
+			products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.GREAT).build());
+			products.add(new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.LUXURIOUS).build());
+		}
+		
 		return products;
 	}
 	
@@ -90,13 +102,16 @@ public abstract class ProductsFacade
 	public static List<Product> generateListOfTablets() throws Exception
 	{
 		List<Product> products = new ArrayList<Product>();
-			
-		products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.ECONOMY).build());
-		products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.INTERMEDIATE).build());
-		products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.GOOD).build());
-		products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.GREAT).build());
-		products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.LUXURIOUS).build());
-			
+		
+		for(int i = 0; i < 5; i++)
+		{
+			products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.ECONOMY).build());
+			products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.INTERMEDIATE).build());
+			products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.GOOD).build());
+			products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.GREAT).build());
+			products.add(new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.LUXURIOUS).build());
+		}
+		
 		return products;
 	}
 	
