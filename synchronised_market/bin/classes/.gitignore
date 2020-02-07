@@ -1,4 +1,5 @@
-/environments/
-/actions/
 /entities/
+/actions/
+/environments/
 /reputationModels/
+/enums/

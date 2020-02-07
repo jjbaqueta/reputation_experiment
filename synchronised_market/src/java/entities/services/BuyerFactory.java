@@ -2,11 +2,11 @@ package entities.services;
 
 import java.util.List;
 
-import entities.model.Buyer;
-import entities.model.DeliveryOrientedBuyer;
-import entities.model.PriceOrientedBuyer;
 import entities.model.Product;
-import entities.model.QualityOrientedBuyer;
+import entities.model.buyers.Buyer;
+import entities.model.buyers.DeliveryOrientedBuyer;
+import entities.model.buyers.PriceOrientedBuyer;
+import entities.model.buyers.QualityOrientedBuyer;
 import enums.BuyerType;
 
 /*

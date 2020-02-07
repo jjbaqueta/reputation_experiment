@@ -63,7 +63,7 @@ find_product_by_name(P_name, Products)
 +!delivery(CNPId, Buyer)
 	:	proposal(CNPId, P_name, Offer)
 	<-	.my_name(N);
-		actions.sellerDefineDeliveryConditions(N, Offer, NewOffer);
+		actions.sellerDefineDeliveryConditions(N, Offer, CNPId, NewOffer);
 		.send(Buyer, tell, delivered(CNPId, NewOffer));
 		!clear_memory(CNPId).
 

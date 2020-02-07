@@ -8,14 +8,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import entities.model.Buyer;
-import entities.model.GeneralOrientedBuyer;
 import entities.model.Product;
-import entities.model.Seller;
+import entities.model.buyers.Buyer;
+import entities.model.buyers.GeneralOrientedBuyer;
+import entities.model.sellers.GeneralSeller;
+import entities.model.sellers.Seller;
+import entities.services.BehaviorFactory;
 import entities.services.BuyerFactory;
 import entities.services.MarketFacade;
 import entities.services.ProductsFacade;
 import entities.services.SellerFactory;
+import enums.BehaviorPattern;
 import enums.BuyerType;
 import enums.CriteriaType;
 import enums.SellerType;
@@ -28,24 +31,28 @@ public class Market extends Environment
 {
 	/** Constants (experiment parameters): */
 
-	private static final int BAD_SELLERS = 1;
-	private static final int GOOD_SELLERS = 1;
+	private static final int BAD_SELLERS = 0;
+	private static final int GOOD_SELLERS = 0;
 	private static final int NEUTRAL_SELLERS = 0;
-	private static final int ITEMS_SOLD_BY_SELLER = 3;	//at most 25
+	private static final int GENERAL_SELLERS = 3;
+	private static final int ITEMS_SOLD_BY_SELLER = 5;	//at most 25
 
 	private static final int PRICE_BUYERS = 5;
 	private static final int QUALITY_BUYERS = 5;
 	private static final int DELIVERY_BUYERS = 5;
 	private static final int GENERAL_BUYERS = 5;
 	private static final int ORDERS_BY_BUYER = 5;
+	
+	private static final int TOTAL_RESQUESTS = (PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER;
 
 	/** This file is used to save the sale informations for posterior analysis */
 	
-	private File file = new File("sale.txt");
+	public static File fileSales = new File("sale.txt");
+	public static File fileRep = new File("rep.txt");
 	
 	/** Static attributes: */
 
-	public static Seller[] sellers = new Seller[BAD_SELLERS + NEUTRAL_SELLERS + GOOD_SELLERS];
+	public static Seller[] sellers = new Seller[BAD_SELLERS + NEUTRAL_SELLERS + GOOD_SELLERS + GENERAL_SELLERS];
 	public static Buyer[] buyers = new Buyer[PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS];
 
 	/** Class attributes: */
@@ -61,8 +68,11 @@ public class Market extends Environment
 		try 
 		{	
 			// Deleting the 'sale.txt' file, if it exists
-			if(file.exists())
-				file.delete();
+			if(fileSales.exists())
+				fileSales.delete();
+			
+			if(fileRep.exists())
+				fileRep.delete();
 
 			
 			// Defining the criteria used by model of reputation
@@ -96,6 +106,36 @@ public class Market extends Environment
 			for (int i = 0; i < GOOD_SELLERS; i++)
 				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
 			
+			
+			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
+			
+			GeneralSeller s1 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+			
+			s1.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, TOTAL_RESQUESTS));
+			s1.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+			s1.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+			
+			sellers[j++] = s1;
+			
+			GeneralSeller s2 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+			
+			s2.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, TOTAL_RESQUESTS));
+			s2.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, TOTAL_RESQUESTS));
+			s2.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, TOTAL_RESQUESTS));
+			
+			sellers[j++] = s2;
+			
+			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
+			
+			GeneralSeller s3 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+			
+			s3.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, TOTAL_RESQUESTS));
+			s3.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, TOTAL_RESQUESTS));
+			s3.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+			
+			sellers[j++] = s3;
+
+
 			long time = System.currentTimeMillis();
 			
 			// Writing in the output file the initial sale state of each seller
@@ -241,7 +281,7 @@ public class Market extends Environment
 	public void showFinalReport() 
 	{	
 		System.out.println("\n---------------------- FINAL REPORT --------------------------");
-		System.out.println(" -> Number of purchase requests: " + ((PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER) + "\n");
+		System.out.println(" -> Number of purchase requests: " + TOTAL_RESQUESTS + "\n");
 		
 		System.out.println("Informations about sellers:");
 		
@@ -262,7 +302,7 @@ public class Market extends Environment
 	public void writeSaleStatus(Seller seller, long time)
 	{
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(fileSales, true));
 			writer.append(seller.getName() + "," + seller.getMyType() + "," + time + "," + seller.getSaleMadeCount() +"\n");			     
 		    writer.close();
 		} catch (IOException e) {

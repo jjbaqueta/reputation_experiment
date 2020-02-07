@@ -2,11 +2,11 @@ package entities.services;
 
 import java.util.List;
 
-import entities.model.BadSeller;
-import entities.model.GoodSeller;
-import entities.model.NeutralSeller;
 import entities.model.Product;
-import entities.model.Seller;
+import entities.model.sellers.BadSeller;
+import entities.model.sellers.GoodSeller;
+import entities.model.sellers.NeutralSeller;
+import entities.model.sellers.Seller;
 import enums.SellerType;
 
 /*

@@ -180,6 +180,29 @@ public abstract class ProductsFacade
     	else return null;
     }
     
+	
+    /*
+     * This method generates a subset of products from available list of products (always picks the three last items from list)
+	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
+	 * @param availableProducts List of Products available to sell
+     * @return A set of products of size equals the amountOfItems parameter
+     */
+    public static Set<Product> getNoRadomSubsetFrom(int amountOfItems, List<Product> availableProducts)
+    {	
+    	if(availableProducts.size() > amountOfItems)
+    	{
+    		Set<Product> productsForSell = new LinkedHashSet<Product>();
+	    	
+	    	while(amountOfItems > 0)
+	    	{
+	    		if(productsForSell.add(availableProducts.get(amountOfItems - 1)))
+	    			amountOfItems--;
+	    	}	    		    	
+	    	return productsForSell;
+    	}
+    	else return null;
+    }
+    
 	/*
      * This method shows a list of products
      * @param products A list of products

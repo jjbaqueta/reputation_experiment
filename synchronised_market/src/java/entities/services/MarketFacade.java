@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import entities.model.Buyer;
 import entities.model.Product;
-import entities.model.Seller;
+import entities.model.buyers.Buyer;
+import entities.model.sellers.Seller;
 import environments.Market;
 import jason.asSyntax.Literal;
 

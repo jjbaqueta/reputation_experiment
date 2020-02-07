@@ -1,7 +1,9 @@
-package entities.model;
+package entities.model.sellers;
 
 import java.util.List;
 
+import entities.model.Offer;
+import entities.model.Product;
 import jason.asSyntax.Literal;
 
 /*

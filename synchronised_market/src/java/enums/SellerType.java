@@ -7,5 +7,6 @@ public enum SellerType
 {
 	BAD,
 	NEUTRAL,
-	GOOD
+	GOOD,
+	GENERAL
 }

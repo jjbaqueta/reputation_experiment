@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import entities.model.Buyer;
 import entities.model.Offer;
-import entities.model.Seller;
+import entities.model.buyers.Buyer;
+import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import environments.Market;
 import jason.JasonException;

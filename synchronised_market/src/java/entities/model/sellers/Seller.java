@@ -1,4 +1,4 @@
-package entities.model;
+package entities.model.sellers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import entities.model.Offer;
+import entities.model.Product;
+import entities.model.SimpleAgent;
 import entities.services.ProductsFacade;
 import jason.asSyntax.Literal;
 
@@ -33,7 +36,27 @@ public abstract class Seller extends SimpleAgent
 		double priceFactor = 0.2 * rand.nextDouble();
 		double qualityFactor = 0.2 * rand.nextDouble();
 		double deliveryFactor = 0.2 * rand.nextDouble();
+		
 		setMySellConditions(priceFactor, qualityFactor, deliveryFactor);
+	}
+	
+	/*
+	 * This constructor initializes the list of products sold by seller
+	 * @param name Seller's name
+	 * @param amountOfItems Integer value that represents the number of products that the seller can sell
+	 * @param priceMargin A double value that defines the maximum price variation
+	 * @param qualityMargin A double value that defines the maximum quality variation
+	 * @param deliveryMargin A double value that defines the maximum delivery time variation
+	 * @param availableProducts List of Products available to sell
+	 */
+	public Seller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin,  List<Product> availableProducts) 
+	{
+		super.setName(name);
+		productsForSale = ProductsFacade.getNoRadomSubsetFrom(amountOfItems, availableProducts);
+		saleMadeCount = 0;
+		saleLostCount = 0;
+		
+		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
 	}
 	
 	/*

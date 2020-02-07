@@ -1,9 +1,11 @@
-package entities.model;
+package entities.model.buyers;
 
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import entities.model.Product;
+import entities.model.SimpleAgent;
 import entities.services.MarketFacade;
 import jason.asSyntax.Literal;
 

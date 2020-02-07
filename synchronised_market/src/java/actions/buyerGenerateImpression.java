@@ -1,8 +1,8 @@
 package actions;
 
-import entities.model.Buyer;
 import entities.model.Offer;
-import entities.model.Seller;
+import entities.model.buyers.Buyer;
+import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import enums.CriteriaType;
 import environments.Market;

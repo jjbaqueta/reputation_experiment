@@ -1,7 +1,7 @@
 package actions;
 
 import entities.model.Offer;
-import entities.model.Seller;
+import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import environments.Market;
 import jason.JasonException;
@@ -22,7 +22,8 @@ public class sellerDefineDeliveryConditions extends DefaultInternalAction
 	 * The contract informations are passed from the array args:
 	 * - args[0]: seller's name
 	 * - args[1]: proposal used to define an agreement between the seller and buyer (initial contract)
-	 * - args[2]: new contract which may be adjusted according seller's type (return)
+	 * - args[2]: task's CNPId
+	 * - args[3]: new contract which may be adjusted according seller's type (return)
 	 */	
 	@Override
 	public Object execute( TransitionSystem ts, Unifier un, Term[] args ) throws JasonException 
@@ -35,9 +36,12 @@ public class sellerDefineDeliveryConditions extends DefaultInternalAction
 			
 			// Parsing the offer received
 			Offer offer = Offer.parseProposal(args[1].toString(), seller);
-						
+			
+			// Get the cnpid
+			offer.setCnpid(Integer.parseInt(args[2].toString()));
+			
 			//Returns the result as Term
-			return un.unifies(seller.computeContractConditions(offer), args[2]);		
+			return un.unifies(seller.computeContractConditions(offer), args[3]);		
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{

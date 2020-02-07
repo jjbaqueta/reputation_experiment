@@ -118,6 +118,7 @@ check_impressions(Ag, Impressions)
 	:	check_impressions(Ag, Impressions) & Impressions \== []
 	<-	actions.buyerCalculateReputation(Impressions, Reputation_profile);
 		.send(Ag, tell, Reputation_profile);
+		actions.sellerSaveReputation(Reputation_profile, R);
 		!update_reputation(Reputation_profile);
 		!compute_reputation(T).
 

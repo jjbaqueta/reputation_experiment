@@ -4,9 +4,9 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import entities.model.Buyer;
-import entities.model.Seller;
 import entities.model.SimpleAgent;
+import entities.model.buyers.Buyer;
+import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import enums.CriteriaType;
 import environments.Market;

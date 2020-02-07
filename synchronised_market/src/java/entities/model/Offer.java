@@ -1,5 +1,6 @@
 package entities.model;
 
+import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import environments.Market;
 
@@ -14,6 +15,7 @@ public class Offer
 	private Double quality;			// Criteria 2: product's quality
 	private Integer deliveryTime;	// Criteria 3: delivery time
 	private Seller seller;			// Who sells the product
+	private int cnpid;				// Offer's cnpid
 	
 	public Offer(String product, Double price, Double quality, Integer deleveryTime, Seller seller) 
 	{		
@@ -22,6 +24,7 @@ public class Offer
 		this.quality = quality;
 		this.deliveryTime = deleveryTime;
 		this.seller = seller;
+		this.cnpid = 0;
 	}
 
 	public String getProduct() 
@@ -47,6 +50,14 @@ public class Offer
 	public Seller getSeller() 
 	{
 		return seller;
+	}
+
+	public int getCnpid() {
+		return cnpid;
+	}
+
+	public void setCnpid(int cnpid) {
+		this.cnpid = cnpid;
 	}
 
 	/*

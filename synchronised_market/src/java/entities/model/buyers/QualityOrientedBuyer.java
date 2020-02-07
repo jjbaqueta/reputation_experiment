@@ -1,6 +1,8 @@
-package entities.model;
+package entities.model.buyers;
 
 import java.util.List;
+
+import entities.model.Product;
 
 /*
  * This Class implements a QualityOrientedBuyer

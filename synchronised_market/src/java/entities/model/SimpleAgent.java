@@ -18,7 +18,8 @@ public abstract class SimpleAgent extends Agent implements Comparable<SimpleAgen
 
 	public String getMyType()
 	{
-		return getClass().toString().split("\\.")[2];
+		String[] path = getClass().toString().split("\\."); 
+		return path[path.length - 1];
 	}
 	
 	@Override
