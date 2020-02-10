@@ -4,7 +4,6 @@ import java.util.List;
 
 import entities.model.Offer;
 import entities.model.Product;
-import jason.asSyntax.Literal;
 
 /*
  * This Class implements a GoodSeller
@@ -25,9 +24,13 @@ public class GoodSeller extends Seller{
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
 	@Override
-	public Literal computeContractConditions(Offer agreedOffer) 
+	public Offer computeContractConditions(Offer agreedOffer) 
 	{
-		return Literal.parseLiteral("p(" + agreedOffer.getProduct() + "," + agreedOffer.getPrice() + "," + agreedOffer.getQuality() + "," + agreedOffer.getDeliveryTime() + ")");
+		return (Offer) new Offer(agreedOffer.getProduct().getName(), 
+								 agreedOffer.getProduct().getPrice(), 
+								 agreedOffer.getProduct().getQuality(), 
+								 agreedOffer.getProduct().getDeliveryTime(), 
+								 agreedOffer.getSeller());
 	}
 
 }

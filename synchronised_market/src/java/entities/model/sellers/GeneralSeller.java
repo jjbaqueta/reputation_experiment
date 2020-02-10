@@ -5,7 +5,6 @@ import java.util.List;
 import entities.model.Offer;
 import entities.model.Product;
 import entities.model.behaviors.Behavior;
-import jason.asSyntax.Literal;
 
 /*
  * This Class implements a GeneralSeller
@@ -29,15 +28,29 @@ public class GeneralSeller extends Seller
 	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
+//	@Override
+//	public Offer computeContractConditions(Offer agreedOffer) 
+//	{	
+//		double realPrice = agreedOffer.getProduct().getPrice() * (1 + priceBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+//		double realQuality = agreedOffer.getProduct().getQuality() * (1 - qualityBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+//		double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + deliveryBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+//		
+//		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
+//	}
+	
 	@Override
-	public Literal computeContractConditions(Offer agreedOffer) 
+	public Offer computeContractConditions(Offer agreedOffer) 
 	{	
-		double realPrice = agreedOffer.getPrice() * (1 + priceBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-		double realQuality = agreedOffer.getQuality() * (1 - qualityBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-		double realDeliveryTime = (int) (agreedOffer.getDeliveryTime() * (1 + deliveryBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+		Behavior pBehavior = agreedOffer.getProduct().getSalesBehaviorPrice();
+		Behavior qBehavior = agreedOffer.getProduct().getSalesBehaviorQuality();
+		Behavior dBehavior = agreedOffer.getProduct().getSalesBehaviorDelivery();
 		
-		return Literal.parseLiteral("p(" + agreedOffer.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
-	}
+		double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+		double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+		double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+		
+		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
+	} 
 
 	public void setPriceBehavior(Behavior priceBehavior) 
 	{

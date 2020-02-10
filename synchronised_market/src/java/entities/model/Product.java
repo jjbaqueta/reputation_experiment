@@ -1,5 +1,8 @@
 package entities.model;
 
+import entities.model.behaviors.Behavior;
+import jason.asSyntax.Literal;
+
 /*
  * This class implements a Product
  * The products are the base elements to negotiation between buyers and sellers 
@@ -10,6 +13,9 @@ public class Product
 	private Double price;
 	private Double quality;
 	private Integer deliveryTime;
+	private Behavior salesBehaviorPrice;
+	private Behavior salesBehaviorQuality;
+	private Behavior salesBehaviorDelivery;
 	
 	public Product(String name, Double price, Double quality, Integer deliveryTime) 
 	{
@@ -17,6 +23,8 @@ public class Product
 		this.price = price;
 		this.quality = quality;
 		this.deliveryTime = deliveryTime;
+		
+		// select behavior in this part
 	}
 
 	public String getName() 
@@ -58,7 +66,38 @@ public class Product
 	{
 		this.deliveryTime = deliveryTime;
 	}
+	
+	public void setSalesBehaviorPrice(Behavior salesBehaviorPrice) 
+	{
+		this.salesBehaviorPrice = salesBehaviorPrice;
+	}
+	
+	public Behavior getSalesBehaviorPrice()
+	{
+		return this.salesBehaviorPrice;
+	}
+	
+	public Behavior getSalesBehaviorQuality() {
+		return salesBehaviorQuality;
+	}
 
+	public void setSalesBehaviorQuality(Behavior salesBehaviorQuality) {
+		this.salesBehaviorQuality = salesBehaviorQuality;
+	}
+
+	public Behavior getSalesBehaviorDelivery() {
+		return salesBehaviorDelivery;
+	}
+
+	public void setSalesBehaviorDelivery(Behavior salesBehaviorDelivery) {
+		this.salesBehaviorDelivery = salesBehaviorDelivery;
+	}
+
+	public Literal getProductAsLiteral()
+	{
+		return Literal.parseLiteral("p(" + name + "," + price + "," + quality + "," + deliveryTime + ")");
+	}
+	
 	@Override
 	public String toString() 
 	{

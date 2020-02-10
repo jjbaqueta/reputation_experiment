@@ -25,23 +25,23 @@ public abstract class ReGret extends ReputationModel{
 	/*
 	 * This method computes the subjective reputation for all evaluated criteria 
 	 * @param currentTime Time instant used during the computation of subjective reputation.
-	 * @param impressions List of impressions considered to compute the subjective reputation.
+	 * @param ratings List of impressions considered to compute the subjective reputation.
 	 * @return the reputation value for each criterion.
 	 */
-	public static double[] computeSubjectiveReputation(long currentTime, List<Impression> impressions)
+	public static double[] computeSubjectiveReputation(long currentTime, List<Rating> ratings)
 	{
-		double functionTj = getFunctionTj(impressions, currentTime);
+		double functionTj = getFunctionTj(ratings, currentTime);
 		double functionTi, rPrice = 0, rQuality = 0, rDelivery = 0;
 	
 		double[] reputations = new double[criteria.size()];		// Stores reputation of each evaluated criterion 
 		
-		for(Impression imp : impressions)
+		for(Rating rating : ratings)
 		{
-			functionTi = (((double) imp.getTime()/currentTime)/functionTj);
+			functionTi = (((double) rating.getTime()/currentTime)/functionTj);
 			
-			rPrice += functionTi * (double) imp.getRatings().get(criteria.get(0).getName());
-			rQuality += functionTi * (double) imp.getRatings().get(criteria.get(1).getName());
-			rDelivery += functionTi * (double) imp.getRatings().get(criteria.get(2).getName());
+			rPrice += functionTi * (double) rating.getScores().get(criteria.get(0).getName());
+			rQuality += functionTi * (double) rating.getScores().get(criteria.get(1).getName());
+			rDelivery += functionTi * (double) rating.getScores().get(criteria.get(2).getName());
 		}
 		
 		reputations[0] = rPrice;
@@ -55,27 +55,27 @@ public abstract class ReGret extends ReputationModel{
 	 * This method computes the reliability of subjective reputation 
 	 * @param subjectiveRep Subjective reputation from criterion selected.
 	 * @param currentTime Time instant used during the computation of subjective reputation.
-	 * @param impressions List of impressions considered to compute the subjective reputation.
+	 * @param ratings List of impressions considered to compute the subjective reputation.
 	 * @return how much reliable is the subjective reputation for each evaluated criterion
 	 */
-	public static double[] computeReliability(double[] subjectiveRep, long currentTime, List<Impression> impressions)
+	public static double[] computeReliability(double[] subjectiveRep, long currentTime, List<Rating> ratings)
 	{
 		// Computing population average
 		double averagePrice = 0, averageQuality = 0, averageDelivery = 0;
 		
 		double[] reliabilities = new double[criteria.size()];		// Stores reliability degree for each subjective reputation value
-		double[] deviations = computeDeviation(subjectiveRep, currentTime, impressions);
-		double ni = computeNi(impressions);
+		double[] deviations = computeDeviation(subjectiveRep, currentTime, ratings);
+		double ni = computeNi(ratings);
 		
-		for(Impression imp : impressions)
+		for(Rating rating : ratings)
 		{
-			averagePrice += (double) imp.getRatings().get(criteria.get(0).getName());
-			averageQuality += (double) imp.getRatings().get(criteria.get(1).getName());
-			averageDelivery += (double) imp.getRatings().get(criteria.get(2).getName());
+			averagePrice += (double) rating.getScores().get(criteria.get(0).getName());
+			averageQuality += (double) rating.getScores().get(criteria.get(1).getName());
+			averageDelivery += (double) rating.getScores().get(criteria.get(2).getName());
 		}
-		averagePrice /= impressions.size();
-		averageQuality /= impressions.size();
-		averageDelivery /= impressions.size();
+		averagePrice /= ratings.size();
+		averageQuality /= ratings.size();
+		averageDelivery /= ratings.size();
 		
 		// Computing reliability
 		reliabilities[0] = (1 - averagePrice) * ni + averagePrice * deviations[0];
@@ -91,10 +91,10 @@ public abstract class ReGret extends ReputationModel{
 	 * @param impressions List of impressions considered to compute the subjective reputation.
 	 * @return how much expressive is the list of impressions
 	 */
-	private static double computeNi(List<Impression> impressions)
+	private static double computeNi(List<Rating> ratings)
 	{	
 		// Number of impressions used to calculate the reputation.
-		int cardinality = impressions.size();
+		int cardinality = ratings.size();
 	
 		/*
 		 * Computing Ni
@@ -112,29 +112,29 @@ public abstract class ReGret extends ReputationModel{
 	 * A deviation value near 0 indicates a high variability, in turn, close to 1 indicates a low variability (bigger reliability).
 	 * @param subjectiveRep Subjective reputation from criterion selected.
 	 * @param currentTime Time instant used during the computation of subjective reputation.
-	 * @param impressions List of impressions considered to compute the subjective reputation.
+	 * @param ratings List of impressions considered to compute the subjective reputation.
 	 * @return Deviation of subjective reputation.
 	 */
-	public static double[] computeStardardDeviation(double[] subjectiveRep, long currentTime, List<Impression> impressions)
+	public static double[] computeStardardDeviation(double[] subjectiveRep, long currentTime, List<Rating> ratings)
 	{
-		double functionTj = getFunctionTj(impressions, currentTime);	
+		double functionTj = getFunctionTj(ratings, currentTime);	
 		double functionTi = 0, dPrice = 0, dQuality = 0, dDelivery = 0;		
 		
 		double[] deviations = new double[criteria.size()];		// Stores deviation values of each evaluated criterion
 		
 		// Computing standard deviation in relation to subjective reputation
-		for(Impression imp : impressions)
+		for(Rating retaing : ratings)
 		{
-			functionTi = (((double) imp.getTime()/currentTime)/functionTj);
+			functionTi = (((double) retaing.getTime()/currentTime)/functionTj);
 			
-			dPrice += functionTi * Math.pow(((double) imp.getRatings().get(criteria.get(0).getName()) - subjectiveRep[0]), 2);
-			dQuality += functionTi * Math.pow(((double) imp.getRatings().get(criteria.get(1).getName()) - subjectiveRep[1]), 2);
-			dDelivery += functionTi * Math.pow(((double) imp.getRatings().get(criteria.get(2).getName()) - subjectiveRep[2]), 2);
+			dPrice += functionTi * Math.pow(((double) retaing.getScores().get(criteria.get(0).getName()) - subjectiveRep[0]), 2);
+			dQuality += functionTi * Math.pow(((double) retaing.getScores().get(criteria.get(1).getName()) - subjectiveRep[1]), 2);
+			dDelivery += functionTi * Math.pow(((double) retaing.getScores().get(criteria.get(2).getName()) - subjectiveRep[2]), 2);
 		}
 		
-		deviations[0] = Math.sqrt(dPrice / impressions.size());
-		deviations[1] = Math.sqrt(dQuality / impressions.size());
-		deviations[2] = Math.sqrt(dDelivery / impressions.size());
+		deviations[0] = Math.sqrt(dPrice / ratings.size());
+		deviations[1] = Math.sqrt(dQuality / ratings.size());
+		deviations[2] = Math.sqrt(dDelivery / ratings.size());
 		
 		return deviations;		
 	}
@@ -144,24 +144,24 @@ public abstract class ReGret extends ReputationModel{
 	 * A deviation value near 0 indicates a high variability, in turn, close to 1 indicates a low variability (bigger reliability).
 	 * @param subjectiveRep Subjective reputation from criterion selected.
 	 * @param currentTime Time instant used during the computation of subjective reputation.
-	 * @param impressions List of impressions considered to compute the subjective reputation.
+	 * @param ratings List of impressions considered to compute the subjective reputation.
 	 * @return Deviation of subjective reputation.
 	 */
-	private static double[] computeDeviation(double[] subjectiveRep, long currentTime, List<Impression> impressions)
+	private static double[] computeDeviation(double[] subjectiveRep, long currentTime, List<Rating> Ratings)
 	{
-		double functionTj = getFunctionTj(impressions, currentTime);	
+		double functionTj = getFunctionTj(Ratings, currentTime);	
 		double functionTi = 0, dPrice = 0, dQuality = 0, dDelivery = 0;		
 		
 		double[] deviations = new double[criteria.size()];		// Stores deviation values of each evaluated criterion
 		
 		// Computing standard deviation in relation to subjective reputation
-		for(Impression imp : impressions)
+		for(Rating rating : Ratings)
 		{
-			functionTi = (((double) imp.getTime()/currentTime)/functionTj);
+			functionTi = (((double) rating.getTime()/currentTime)/functionTj);
 			
-			dPrice += functionTi * Math.abs((double) imp.getRatings().get(criteria.get(0).getName()) - subjectiveRep[0]);
-			dQuality += functionTi * Math.abs((double) imp.getRatings().get(criteria.get(1).getName()) - subjectiveRep[1]);
-			dDelivery += functionTi * Math.abs((double) imp.getRatings().get(criteria.get(2).getName()) - subjectiveRep[2]);
+			dPrice += functionTi * Math.abs((double) rating.getScores().get(criteria.get(0).getName()) - subjectiveRep[0]);
+			dQuality += functionTi * Math.abs((double) rating.getScores().get(criteria.get(1).getName()) - subjectiveRep[1]);
+			dDelivery += functionTi * Math.abs((double) rating.getScores().get(criteria.get(2).getName()) - subjectiveRep[2]);
 		}
 		
 		deviations[0] = 1.0 - dPrice;
@@ -173,18 +173,18 @@ public abstract class ReGret extends ReputationModel{
 	
 	/*
 	 * This method applies a time adjusting according to function f(t, tj), the importance level of a rating must reduce with time.
-	 * @param impressions List of impressions considered to compute the subjective reputation.
+	 * @param ratings List of impressions considered to compute the subjective reputation.
 	 * @param currentTime Time instant used during the computation of subjective reputation.
 	 * @return Time adjustment factor. 
 	 */
-	private static double getFunctionTj(List<Impression> impressions, long currentTime)
+	private static double getFunctionTj(List<Rating> ratings, long currentTime)
 	{
 		// Computing sum of p(t, tj)
 		double functionTj = 0;
 		
-		for(Impression imp : impressions)
+		for(Rating rating : ratings)
 		{
-			functionTj += (double) imp.getTime()/currentTime;
+			functionTj += (double) rating.getTime()/currentTime;
 		}
 		return functionTj;
 	}

@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import entities.model.Product;
+import enums.BehaviorPattern;
 import enums.ProductClassType;
 import enums.ProductDefault;
 
@@ -156,6 +157,57 @@ public abstract class ProductsFacade
 		return products;
 	}
 	
+	/*
+	 * This method generates a list which contains all possible combinations of products
+	 * @return a complete list of products 
+	 */
+	public static List<Product> customListOfProducts(int controlFactor) throws Exception
+	{
+		List<Product> products = new ArrayList<Product>();
+		
+		Product p1 = new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build();
+		
+		p1.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, controlFactor));
+		p1.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, controlFactor));
+		p1.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, controlFactor));
+		
+		products.add(p1);
+		
+		Product p2 = new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build();
+		
+		p2.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, controlFactor));
+		p2.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, controlFactor));
+		p2.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, controlFactor));
+		
+		products.add(p2);
+		
+		Product p3 = new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build();
+		
+		p3.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, controlFactor));
+		p3.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, controlFactor));
+		p3.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, controlFactor));
+		
+		products.add(p3);
+		
+		Product p4 = new ProductBuilder(ProductDefault.SMARTPHONE.name(), ProductClassType.ECONOMY).build();
+		
+		p4.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, controlFactor));
+		p4.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, controlFactor));
+		p4.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, controlFactor));
+		
+		products.add(p4);
+		
+		Product p5 = new ProductBuilder(ProductDefault.TABLET.name(), ProductClassType.ECONOMY).build();
+		
+		p5.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_DECREASING, controlFactor));
+		p5.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, controlFactor));
+		p5.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, controlFactor));
+		
+		products.add(p5);
+		
+		return products;
+	}
+	
     /*
      * This method generates a subset of products from available list of products 
 	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
@@ -164,7 +216,7 @@ public abstract class ProductsFacade
      */
     public static Set<Product> getSubsetFrom(int amountOfItems, List<Product> availableProducts)
     {	
-    	if(availableProducts.size() > amountOfItems)
+    	if(availableProducts.size() >= amountOfItems)
     	{
     		Set<Product> productsForSell = new LinkedHashSet<Product>();
 	    	

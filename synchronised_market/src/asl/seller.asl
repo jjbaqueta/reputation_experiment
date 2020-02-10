@@ -7,6 +7,9 @@ find_product_by_name(P_name, Products)
 	:-	.findall(p(P_name, Price, Quality, Delivery), sell(P_name, Price, Quality, Delivery), Products) & 
 		Products \== [].
 
+//customer_loyalty_level(Buyer, Level)
+//	:-	
+
 /* Goals */
 
 !register.
@@ -62,10 +65,29 @@ find_product_by_name(P_name, Products)
  */
 +!delivery(CNPId, Buyer)
 	:	proposal(CNPId, P_name, Offer)
-	<-	.my_name(N);
-		actions.sellerDefineDeliveryConditions(N, Offer, CNPId, NewOffer);
-		.send(Buyer, tell, delivered(CNPId, NewOffer));
+	<-	!update_relationship(Buyer, Loyalty_level);
+		.my_name(N);
+		actions.sellerDefineDeliveryConditions(N, Offer, CNPId, Loyalty_level, NewOffer);
+		.send(Buyer, tell, delivered(CNPId, NewOffer));		
 		!clear_memory(CNPId).
+
+/*
+ * This plan updates the relationship level between a buyer and a seller
+ */
++!update_relationship(Buyer, Loyalty_level)
+	:	friend(Buyer, Likes)
+	<-	Count = Likes + 1;
+		-friend(Buyer, Likes);
+		+friend(Buyer, Count);
+		Loyalty_level = Count.
+
+/*
+ * Represents the situation where the seller and buyer are not friend yet
+ */
++!update_relationship(Buyer, Loyalty_level)
+	:	not friend(Buyer, _)
+	<-	+friend(Buyer, 1);
+		Loyalty_level = 1.
 
 /*
  * Remove all informations about a given purchase request

@@ -65,15 +65,15 @@ public class buyerGenerateImpression extends DefaultInternalAction{
 	 */
 	private Impression evaluateSeller(Offer proposal, Offer contract, Buyer buyer, Seller seller)
 	{
-		double priceDiscrepancy = contract.getPrice() / proposal.getPrice();
-		double qualityDiscrepancy = proposal.getQuality() / contract.getQuality();
-		double deliveryDiscrepancy = (double) contract.getDeliveryTime() / proposal.getDeliveryTime();
+		double priceDiscrepancy = contract.getProduct().getPrice() / proposal.getProduct().getPrice();
+		double qualityDiscrepancy = proposal.getProduct().getQuality() / contract.getProduct().getQuality();
+		double deliveryDiscrepancy = (double) contract.getProduct().getDeliveryTime() / proposal.getProduct().getDeliveryTime();
 		
 		Impression impression = new Impression(buyer, seller, System.currentTimeMillis());
 		
-		impression.setRating(CriteriaType.PRICE.getValue(), getScore(priceDiscrepancy));
-		impression.setRating(CriteriaType.QUALITY.getValue(), getScore(qualityDiscrepancy));
-		impression.setRating(CriteriaType.DELIVERY.getValue(), getScore(deliveryDiscrepancy));
+		impression.setRatings(CriteriaType.PRICE.getValue(), getScore(priceDiscrepancy));
+		impression.setRatings(CriteriaType.QUALITY.getValue(), getScore(qualityDiscrepancy));
+		impression.setRatings(CriteriaType.DELIVERY.getValue(), getScore(deliveryDiscrepancy));
 		
 		return impression;
 	}

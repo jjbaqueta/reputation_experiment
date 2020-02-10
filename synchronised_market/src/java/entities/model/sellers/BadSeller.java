@@ -5,7 +5,6 @@ import java.util.Random;
 
 import entities.model.Offer;
 import entities.model.Product;
-import jason.asSyntax.Literal;
 
 /*
  * This Class implements a BadSeller
@@ -27,23 +26,23 @@ public class BadSeller extends Seller
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
 	@Override
-	public Literal computeContractConditions(Offer agreedOffer) 
+	public Offer computeContractConditions(Offer agreedOffer) 
 	{
 		Random rand = new Random();
 		
-		double realPrice = agreedOffer.getPrice();
-		double realQuality = agreedOffer.getQuality();
-		int realDeliveryTime = agreedOffer.getDeliveryTime();
+		double realPrice = agreedOffer.getProduct().getPrice();
+		double realQuality = agreedOffer.getProduct().getQuality();
+		int realDeliveryTime = agreedOffer.getProduct().getDeliveryTime();
 
 		int probFactor = rand.nextInt(10);
 
 		if(probFactor < 8)
 		{		
-			realPrice = agreedOffer.getPrice() * (1 + 0.5 * rand.nextDouble());							//up to 50% of increasing
-			realQuality = agreedOffer.getQuality() * (1 - 0.2 * rand.nextDouble());						//up to 20% of decreasing
-			realDeliveryTime = (int) (agreedOffer.getDeliveryTime() * (1 + 0.5 * rand.nextDouble()));	//up to 50% of increasing
+			realPrice = agreedOffer.getProduct().getPrice() * (1 + 0.5 * rand.nextDouble());							//up to 50% of increasing
+			realQuality = agreedOffer.getProduct().getQuality() * (1 - 0.2 * rand.nextDouble());						//up to 20% of decreasing
+			realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + 0.5 * rand.nextDouble()));	//up to 50% of increasing
 		}
 		
-		return Literal.parseLiteral("p(" + agreedOffer.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
+		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
 	}
 }

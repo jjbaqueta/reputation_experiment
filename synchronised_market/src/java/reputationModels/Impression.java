@@ -1,7 +1,5 @@
 package reputationModels;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 
 import entities.model.SimpleAgent;
@@ -12,41 +10,34 @@ import enums.CriteriaType;
 import environments.Market;
 import jason.asSyntax.Literal;
 
-public class Impression {
+public class Impression extends Rating 
+{
 	private SimpleAgent appraiser;
 	private SimpleAgent appraised;
-	private long time;
-	private Dictionary<String, Object> ratings;
 	
 	public Impression(SimpleAgent appraiser, SimpleAgent appraised, long time) 
 	{
+		super(time);
+		
 		this.appraiser = appraiser;
 		this.appraised = appraised;
-		this.time = time;
-		this.ratings = new Hashtable<String, Object>();
 	}
 	
-	public <T> void setRating(String criteriaName, T value)
+	public SimpleAgent getAppraiser() 
 	{
-		ratings.put(criteriaName, value);
-	}
-	
-	public SimpleAgent getAppraiser() {
 		return appraiser;
 	}
 
-	public SimpleAgent getAppraised() {
+	public SimpleAgent getAppraised() 
+	{
 		return appraised;
 	}
 
-	public long getTime() {
+	public long getTime() 
+	{
 		return time;
 	}
 
-	public Dictionary<String, Object> getRatings() {
-		return ratings;
-	}
-	
 	/*
 	 * This method translates an list of impressions (literal) to an list of objects
 	 * Literal format:"[imp(buyer,agent,time,rating),imp(buyer,agent,time,rating), ...]
@@ -69,9 +60,9 @@ public class Impression {
 		
 		Impression imp = new Impression(buyer, seller , time);
 		
-		imp.setRating(CriteriaType.PRICE.getValue(), ratingPrice);
-		imp.setRating(CriteriaType.QUALITY.getValue(), ratingQuality);
-		imp.setRating(CriteriaType.DELIVERY.getValue(), ratingDelivery);
+		imp.setRatings(CriteriaType.PRICE.getValue(), ratingPrice);
+		imp.setRatings(CriteriaType.QUALITY.getValue(), ratingQuality);
+		imp.setRatings(CriteriaType.DELIVERY.getValue(), ratingDelivery);
 		
 		return imp;
 	}
@@ -88,10 +79,10 @@ public class Impression {
 		
 		for(int i = 0; i < list.size() - 1; i++)
 		{
-			strCriteria += ratings.get(list.get(i).getName());
+			strCriteria += scores.get(list.get(i).getName());
 			strCriteria += ",";
 		}
-		strCriteria += ratings.get(list.get(list.size() - 1).getName());
+		strCriteria += scores.get(list.get(list.size() - 1).getName());
 		strCriteria += "]";
 		
 		return Literal.parseLiteral("imp("+appraiser.getName()+","+appraised.getName()+","+time+","+strCriteria+")");
@@ -105,7 +96,7 @@ public class Impression {
 		
 		for(int i = 0; i < list.size(); i++)
 		{
-			strRatings += "(key=" + list.get(i).getName() + " : value=" + ratings.get(list.get(i).getName())+")";
+			strRatings += "(key=" + list.get(i).getName() + " : value=" + scores.get(list.get(i).getName())+")";
 		}
 		strRatings += "}";
 		

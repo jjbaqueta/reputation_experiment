@@ -7,6 +7,9 @@ update_nb_offers(CNPId)
 
 check_impressions(Ag, Impressions)
 	:-	.findall(imp(Buyer, Ag, Time, Rating), imp(Buyer, Ag, Time, Rating), Impressions).
+	
+//check_image(Ag, Impressions)
+//	:-	.findall(image(Buyer, Ag, Time, Rating), image(Ag, _, Time, Rating), Impressions).
 
 /* Goals */
 
@@ -40,7 +43,7 @@ check_impressions(Ag, Impressions)
       	.print("Sending the calls for proposal to: ", Sellers);
       	
       	.wait(update_nb_offers(Id), 4000, _);						// Waiting 4 seconds for proposals
-      	!contract(Id).												// Entering in contract phase
+      	!contract(Id, P_name).										// Entering in contract phase
 
 /*
  * This plan is executed every time that a seller delivery a given product
@@ -59,7 +62,7 @@ check_impressions(Ag, Impressions)
  * This plan needs to be atomic to not accept proposals while contracting
  */
 @cont1[atomic]
-+!contract(CNPId)
++!contract(CNPId, P_name)
  	:	cnp_state(CNPId, propose)									// Checks if the state of CNP is in propose
 	<-	-cnp_state(CNPId,_);										// Update the state of CNP, from propose to contract
       	+cnp_state(CNPId, contract);
@@ -73,8 +76,12 @@ check_impressions(Ag, Impressions)
       	
       	// Update the reputation from sellers 
       	!compute_reputation(Offers);
+      	
       	.findall(rep(Ag, Time, Rprice, Rquality, Rdelivery, Lprice, Lquality, Ldelivery),
       			 rep(Ag, Time, Rprice, Rquality, Rdelivery, Lprice, Lquality, Ldelivery), Reputations);
+      			 
+      	// Retrieve images of every seller with respect a given product (P_name)
+      	.findall(image(Seller, P_name, Time, Rating), image(Seller, P_name, Time, Rating), Images);
       	
       	/*
       	 * TAKE DECISION:
@@ -82,7 +89,7 @@ check_impressions(Ag, Impressions)
       	 * The buyer's preferences and the seller's reputation are considered in this decision 
       	 */  
       	.my_name(N);
-      	actions.buyerFindBestOffer(N, Offers, Reputations, Ag_winner);
+      	actions.buyerFindBestOffer(N, Offers, Reputations, Images, Ag_winner);
       	
       	Ag_winner \== none;											// CONSTRAINT: If exist a winner, the plan continues
       	
@@ -94,12 +101,12 @@ check_impressions(Ag, Impressions)
 /*
  * Nothing to do, the current state of CNP is not 'propose'
  */
-@cont2 +!contract(_).
+@cont2 +!contract(_,_).
 
 /*
  * The execution of the contract (plan: @cont1) has failed
  */
-@cont3 -!contract(CNPId)
+@cont3 -!contract(CNPId, P_name)
 	<-	.print("**** WARNING **** - CNP ",CNPId," has failed! - There were not proposals for the purchase request: ", CNPId);
 		-cnp_state(CNPId,_);
 		+cnp_state(CNPId, finished);									// Update the state of CNP to finished
@@ -185,9 +192,16 @@ check_impressions(Ag, Impressions)
 	:	proposal(CNPId, Offer)[source(Seller)]
 	<-	.my_name(N);
 		actions.buyerGenerateImpression(N, Seller, Offer, NewOffer, Rating);
+		!update_image(Seller, NewOffer, Rating);
 		.df_search("initiator", Buyers);										// Find buyers of a specific group (in this case, initiators)
       	.send(Buyers, tell, Rating);											// Spread the impression in the group of buyers 
 		!clear_memory(CNPId).
+
+/*
+ * This plane updates the image of a given seller
+ */	
++!update_image(Seller, p(Name, _, _, _), imp(_,_, Time, Rating_list))
+	<- +image(Seller, Name, Time, Rating_list).
 
 /*
  * Remove all informations about a given purchase request

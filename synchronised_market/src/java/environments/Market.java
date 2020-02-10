@@ -31,17 +31,30 @@ public class Market extends Environment
 {
 	/** Constants (experiment parameters): */
 
+//	private static final int BAD_SELLERS = 0;
+//	private static final int GOOD_SELLERS = 0;
+//	private static final int NEUTRAL_SELLERS = 0;
+//	private static final int GENERAL_SELLERS = 3;
+//	private static final int ITEMS_SOLD_BY_SELLER = 5;	//at most 25
+//
+//	private static final int PRICE_BUYERS = 5;
+//	private static final int QUALITY_BUYERS = 5;
+//	private static final int DELIVERY_BUYERS = 5;
+//	private static final int GENERAL_BUYERS = 5;
+//	private static final int ORDERS_BY_BUYER = 5;
+	
+	
 	private static final int BAD_SELLERS = 0;
 	private static final int GOOD_SELLERS = 0;
 	private static final int NEUTRAL_SELLERS = 0;
-	private static final int GENERAL_SELLERS = 3;
-	private static final int ITEMS_SOLD_BY_SELLER = 5;	//at most 25
+	private static final int GENERAL_SELLERS = 1;
+	private static final int ITEMS_SOLD_BY_SELLER = 4;	//at most 25
 
-	private static final int PRICE_BUYERS = 5;
-	private static final int QUALITY_BUYERS = 5;
-	private static final int DELIVERY_BUYERS = 5;
-	private static final int GENERAL_BUYERS = 5;
-	private static final int ORDERS_BY_BUYER = 5;
+	private static final int PRICE_BUYERS = 1;
+	private static final int QUALITY_BUYERS = 0;
+	private static final int DELIVERY_BUYERS = 0;
+	private static final int GENERAL_BUYERS = 0;
+	private static final int ORDERS_BY_BUYER = 3;
 	
 	private static final int TOTAL_RESQUESTS = (PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER;
 
@@ -82,8 +95,9 @@ public class Market extends Environment
 
 			// Creating a complete list of products
 //			availableProducts = ProductsFacade.generateCompleteListOfProducts();
-			availableProducts = ProductsFacade.generateListOfTVs();
-
+//			availableProducts = ProductsFacade.generateListOfTVs();
+			availableProducts = ProductsFacade.customListOfProducts(TOTAL_RESQUESTS);
+			
 			// Creating a logger to show messages
 			logger = Logger.getLogger("Log messages for Class: " + Market.class.getName());
 
@@ -106,34 +120,42 @@ public class Market extends Environment
 			for (int i = 0; i < GOOD_SELLERS; i++)
 				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
 			
+			GeneralSeller s1 = new GeneralSeller("seller", ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
 			
-			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
-			
-			GeneralSeller s1 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
-			
-			s1.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, TOTAL_RESQUESTS));
-			s1.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
-			s1.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+//			s1.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, TOTAL_RESQUESTS));
+//			s1.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+//			s1.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
 			
 			sellers[j++] = s1;
 			
-			GeneralSeller s2 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
-			
-			s2.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, TOTAL_RESQUESTS));
-			s2.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, TOTAL_RESQUESTS));
-			s2.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, TOTAL_RESQUESTS));
-			
-			sellers[j++] = s2;
 			
 			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
 			
-			GeneralSeller s3 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+//			GeneralSeller s1 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+//			
+//			s1.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, TOTAL_RESQUESTS));
+//			s1.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+//			s1.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+//			
+//			sellers[j++] = s1;
 			
-			s3.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, TOTAL_RESQUESTS));
-			s3.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, TOTAL_RESQUESTS));
-			s3.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
-			
-			sellers[j++] = s3;
+//			GeneralSeller s2 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+//			
+//			s2.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, TOTAL_RESQUESTS));
+//			s2.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, TOTAL_RESQUESTS));
+//			s2.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, TOTAL_RESQUESTS));
+//			
+//			sellers[j++] = s2;
+//			
+//			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
+//			
+//			GeneralSeller s3 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+//			
+//			s3.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, TOTAL_RESQUESTS));
+//			s3.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, TOTAL_RESQUESTS));
+//			s3.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+//			
+//			sellers[j++] = s3;
 
 
 			long time = System.currentTimeMillis();

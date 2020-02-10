@@ -5,7 +5,6 @@ import java.util.Random;
 
 import entities.model.Offer;
 import entities.model.Product;
-import jason.asSyntax.Literal;
 
 /*
  * This Class implements a NeutralSeller
@@ -28,26 +27,26 @@ public class NeutralSeller extends Seller
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
 	@Override
-	public Literal computeContractConditions(Offer agreedOffer) 
+	public Offer computeContractConditions(Offer agreedOffer) 
 	{
 		Random rand = new Random();
 		
-		double realPrice = agreedOffer.getPrice();
-		double realQuality = agreedOffer.getQuality();
-		int realDeliveryTime = agreedOffer.getDeliveryTime();
+		double realPrice = agreedOffer.getProduct().getPrice();
+		double realQuality = agreedOffer.getProduct().getQuality();
+		int realDeliveryTime = agreedOffer.getProduct().getDeliveryTime();
 		
 		int probFactor = rand.nextInt(6);
 		
 		if(probFactor == 0)
-			realPrice = agreedOffer.getPrice() * (1 + 0.8 * rand.nextDouble());							//up to 80% of increasing
+			realPrice = agreedOffer.getProduct().getPrice() * (1 + 0.8 * rand.nextDouble());							//up to 80% of increasing
 		
 		else if(probFactor == 1)
-			realQuality = agreedOffer.getQuality() * (1 - 0.4 * rand.nextDouble());						//up to 40% of decreasing
+			realQuality = agreedOffer.getProduct().getQuality() * (1 - 0.4 * rand.nextDouble());						//up to 40% of decreasing
 
 		else if (probFactor == 2)
-			realDeliveryTime = (int) (agreedOffer.getDeliveryTime() * (1 + 0.8 * rand.nextDouble()));	//up to 80% of increasing
+			realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + 0.8 * rand.nextDouble()));	//up to 80% of increasing
 		
-		return Literal.parseLiteral("p(" + agreedOffer.getProduct() + "," + realPrice + "," + realQuality + "," + realDeliveryTime + ")");
+		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
 	}
 
 }

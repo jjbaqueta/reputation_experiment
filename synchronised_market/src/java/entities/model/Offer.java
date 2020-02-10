@@ -3,6 +3,7 @@ package entities.model;
 import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import environments.Market;
+import jason.asSyntax.Literal;
 
 /*
  * This class implements an Offer
@@ -10,41 +11,24 @@ import environments.Market;
  */
 public class Offer 
 {
-	private String product;			// Product's name
-	private Double price;			// Criteria 1: product's price
-	private Double quality;			// Criteria 2: product's quality
-	private Integer deliveryTime;	// Criteria 3: delivery time
+	private Product product;		// Product at offer
 	private Seller seller;			// Who sells the product
 	private int cnpid;				// Offer's cnpid
+	private boolean acceptByReputation;
+	private boolean acceptByImage;
 	
 	public Offer(String product, Double price, Double quality, Integer deleveryTime, Seller seller) 
 	{		
-		this.product = product;
-		this.price = price;
-		this.quality = quality;
-		this.deliveryTime = deleveryTime;
+		this.product = new Product(product, price, quality, deleveryTime);
 		this.seller = seller;
 		this.cnpid = 0;
+		this.acceptByReputation = true;
+		this.acceptByImage = true;
 	}
 
-	public String getProduct() 
+	public Product getProduct() 
 	{
 		return product;
-	}
-
-	public Double getPrice() 
-	{
-		return price;
-	}
-
-	public Double getQuality() 
-	{
-		return quality;
-	}
-
-	public Integer getDeliveryTime() 
-	{
-		return deliveryTime;
 	}
 
 	public Seller getSeller() 
@@ -58,6 +42,26 @@ public class Offer
 
 	public void setCnpid(int cnpid) {
 		this.cnpid = cnpid;
+	}
+
+	public void setSeller(Seller seller) {
+		this.seller = seller;
+	}
+	
+	public boolean isAcceptByReputation() {
+		return acceptByReputation;
+	}
+
+	public void setAcceptByReputation(boolean acceptByReputation) {
+		this.acceptByReputation = acceptByReputation;
+	}
+
+	public boolean isAcceptByImage() {
+		return acceptByImage;
+	}
+
+	public void setAcceptByImage(boolean acceptByImage) {
+		this.acceptByImage = acceptByImage;
 	}
 
 	/*
@@ -98,10 +102,22 @@ public class Offer
 		return new Offer(pName, pPrice, pQuality, pDelivery, seller);
 	}
 	
+	public Literal getOfferAsLiteral()
+	{
+		return Literal.parseLiteral("offer(p(" + product.getName() + "," + 
+												 product.getPrice() + "," + 
+												 product.getQuality() + "," + 
+												 product.getDeliveryTime() + "),"+ 
+												 seller.getName() +")");
+	}
+	
 	@Override
 	public String toString() 
 	{
-		return "Offer [product=" + product + ", price=" + price + ", quality=" + quality + ", deleveryTime="
-				+ deliveryTime + ", seller=" + seller.getName() + "]";
+		return "Offer [product=" + product.getName() + 
+					", price=" + product.getPrice() + 
+					", quality=" + product.getQuality() + 
+					", deleveryTime=" + product.getDeliveryTime() + 
+					", seller=" + seller.getName() + "]";
 	}
 }

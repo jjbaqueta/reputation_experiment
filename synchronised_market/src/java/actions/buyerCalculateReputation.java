@@ -11,6 +11,7 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import reputationModels.Impression;
+import reputationModels.Rating;
 import reputationModels.ReGret;
 
 public class buyerCalculateReputation extends DefaultInternalAction{
@@ -28,24 +29,26 @@ public class buyerCalculateReputation extends DefaultInternalAction{
 	{
 		try
 		{	
-			List<Impression> impressions = new ArrayList<Impression>();
+			List<Rating> ratings = new ArrayList<Rating>();
 			
 			// Translating impressions in Literal format to an Object list 
 			ListTerm impressionTermList = (ListTerm) args[0];
 			
 			for(Term t : impressionTermList)
-				impressions.add(Impression.parseImpression(t.toString()));
+				ratings.add(Impression.parseImpression(t.toString()));
 			
-			if(!impressions.isEmpty())
+			if(!ratings.isEmpty())
 			{
 				// Getting current time.
 				long currentTime = System.currentTimeMillis();
 				
 				// Using ReGret model.
-				double[] reputations = ReGret.computeSubjectiveReputation(currentTime, impressions);
-				double[] reliabilities = ReGret.computeReliability(reputations, currentTime, impressions);
+				double[] reputations = ReGret.computeSubjectiveReputation(currentTime, ratings);
+				double[] reliabilities = ReGret.computeReliability(reputations, currentTime, ratings);
 				
-				return un.unifies(Literal.parseLiteral("rep("+impressions.get(0).getAppraised().getName()+","+currentTime+","
+				Impression imp = (Impression) ratings.get(0);
+				
+				return un.unifies(Literal.parseLiteral("rep("+ imp.getAppraised().getName()+","+currentTime+","
 				+reputations[0]+","+reputations[1]+","+reputations[2]+","
 				+reliabilities[0]+","+reliabilities[1]+","+reliabilities[2]+")"), args[1]);
 			}

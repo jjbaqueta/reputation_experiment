@@ -66,7 +66,7 @@ public abstract class Seller extends SimpleAgent
 	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
-	public abstract Literal computeContractConditions(Offer agreedOffer);
+	public abstract Offer computeContractConditions(Offer agreedOffer);
 	
 	/*
 	 * This method is used by seller to change the products attributes according to his own sell conditions
