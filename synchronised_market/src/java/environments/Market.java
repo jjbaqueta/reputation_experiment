@@ -56,7 +56,7 @@ public class Market extends Environment
 	private static final int GENERAL_BUYERS = 0;
 	private static final int ORDERS_BY_BUYER = 3;
 	
-	private static final int TOTAL_RESQUESTS = (PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER;
+	public static final int TOTAL_RESQUESTS = (PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER;
 
 	/** This file is used to save the sale informations for posterior analysis */
 	
@@ -242,7 +242,6 @@ public class Market extends Environment
 		if (action.equals(Literal.parseLiteral("purchase(finished)"))) 
 		{
 			int index = MarketFacade.getBuyerIdFrom(agName);
-			buyers[index].increasePurchaseCompleteCount();
 			
 			clearPercepts(agName);
 

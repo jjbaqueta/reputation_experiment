@@ -5,6 +5,10 @@ import java.util.List;
 import entities.model.Offer;
 import entities.model.Product;
 import entities.model.behaviors.Behavior;
+import entities.services.BehaviorFactory;
+import enums.BehaviorPattern;
+import enums.ProductDefault;
+import environments.Market;
 
 /*
  * This Class implements a GeneralSeller
@@ -12,10 +16,6 @@ import entities.model.behaviors.Behavior;
  */
 public class GeneralSeller extends Seller
 {
-	private Behavior priceBehavior;
-	private Behavior qualityBehavior;
-	private Behavior deliveryBehavior;
-	
 	// Constructor
 	public GeneralSeller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> availableProducts) 
 	{
@@ -28,42 +28,77 @@ public class GeneralSeller extends Seller
 	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
-//	@Override
-//	public Offer computeContractConditions(Offer agreedOffer) 
-//	{	
-//		double realPrice = agreedOffer.getProduct().getPrice() * (1 + priceBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-//		double realQuality = agreedOffer.getProduct().getQuality() * (1 - qualityBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-//		double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + deliveryBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
-//		
-//		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
-//	}
-	
 	@Override
 	public Offer computeContractConditions(Offer agreedOffer) 
 	{	
-		Behavior pBehavior = agreedOffer.getProduct().getSalesBehaviorPrice();
-		Behavior qBehavior = agreedOffer.getProduct().getSalesBehaviorQuality();
-		Behavior dBehavior = agreedOffer.getProduct().getSalesBehaviorDelivery();
+		Product product = getProductFromName(agreedOffer.getProduct());
 		
-		double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-		double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-		double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+		if(product != null)
+		{
+			Behavior pBehavior = product.getSalesBehaviorPrice();
+			Behavior qBehavior = product.getSalesBehaviorQuality();
+			Behavior dBehavior = product.getSalesBehaviorDelivery();
+			
+			double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+			double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+			double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+			
+			return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
+		}
 		
-		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
-	} 
-
-	public void setPriceBehavior(Behavior priceBehavior) 
-	{
-		this.priceBehavior = priceBehavior;
+		return null;
 	}
-
-	public void setQualityBehavior(Behavior qualityBehavior) 
-	{
-		this.qualityBehavior = qualityBehavior;
-	}
-
-	public void setDeliveryBehavior(Behavior deliveryBehavior) 
-	{
-		this.deliveryBehavior = deliveryBehavior;
+	
+	@Override
+	public void defineProductsSalesBehavior() 
+	{		
+		
+		for(Product product : productsForSale)
+		{
+			try 
+			{
+				String productName = product.getName().toUpperCase();
+				
+				if (productName.contentEquals(ProductDefault.TV.name()))
+				{
+					product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+				}
+				else if (productName.contentEquals(ProductDefault.DESKTOP.name()))
+				{
+					product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, Market.TOTAL_RESQUESTS));
+				}
+				else if (productName.contentEquals(ProductDefault.NOTEBOOK.name()))
+				{
+					product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_DECREASING, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_DECREASING, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_DECREASING, Market.TOTAL_RESQUESTS));
+				}
+				else if (productName.contentEquals(ProductDefault.SMARTPHONE.name()))
+				{
+					product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, Market.TOTAL_RESQUESTS));
+				}
+				else if (productName.contentEquals(ProductDefault.TABLET.name()))
+				{
+					product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, Market.TOTAL_RESQUESTS));
+					product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, Market.TOTAL_RESQUESTS));
+				}
+				else
+				{
+					throw new Exception("Type of product it is not valid!");
+				}
+			} 
+			catch (Exception e) 
+			{
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}	
 	}
 }

@@ -14,7 +14,7 @@ import jason.asSyntax.Literal;
 
 public abstract class Seller extends SimpleAgent
 {
-	private Set<Product> productsForSale;	// Items for sale
+	protected Set<Product> productsForSale;	// Items for sale
 	private int saleMadeCount;				// Number of sale that were performed
 	private int saleLostCount;				// Number of sale that were lost
 	
@@ -37,6 +37,7 @@ public abstract class Seller extends SimpleAgent
 		double qualityFactor = 0.2 * rand.nextDouble();
 		double deliveryFactor = 0.2 * rand.nextDouble();
 		
+		defineProductsSalesBehavior();
 		setMySellConditions(priceFactor, qualityFactor, deliveryFactor);
 	}
 	
@@ -56,8 +57,11 @@ public abstract class Seller extends SimpleAgent
 		saleMadeCount = 0;
 		saleLostCount = 0;
 		
+		defineProductsSalesBehavior();
 		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
 	}
+	
+	public abstract void defineProductsSalesBehavior();
 	
 	/*
 	 * This method is an abstract method which must be implemented by all sellers that extend this class.
@@ -97,6 +101,16 @@ public abstract class Seller extends SimpleAgent
 			saleList.add(Literal.parseLiteral("sell("+product.getName().toLowerCase()+","+product.getPrice()+","+product.getQuality()+","+product.getDeliveryTime()+")"));
 		
 		return saleList;
+	}
+	
+	public Product getProductFromName(Product p) 
+	{
+		for (Product product : productsForSale)
+		{
+			if (product.equals(p))
+				return product;
+		}
+		return null;
 	}
 	
 	public Set<Product> getProductsForSale()

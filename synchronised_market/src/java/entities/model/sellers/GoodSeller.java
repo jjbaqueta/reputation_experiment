@@ -4,6 +4,9 @@ import java.util.List;
 
 import entities.model.Offer;
 import entities.model.Product;
+import entities.services.BehaviorFactory;
+import enums.BehaviorPattern;
+import environments.Market;
 
 /*
  * This Class implements a GoodSeller
@@ -31,6 +34,25 @@ public class GoodSeller extends Seller{
 								 agreedOffer.getProduct().getQuality(), 
 								 agreedOffer.getProduct().getDeliveryTime(), 
 								 agreedOffer.getSeller());
+	}
+	
+	@Override
+	public void defineProductsSalesBehavior() 
+	{
+		for(Product product : productsForSale)
+		{
+			try 
+			{
+				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+			} 
+			catch (Exception e) 
+			{
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}	
 	}
 
 }

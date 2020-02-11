@@ -5,6 +5,9 @@ import java.util.Random;
 
 import entities.model.Offer;
 import entities.model.Product;
+import entities.services.BehaviorFactory;
+import enums.BehaviorPattern;
+import environments.Market;
 
 /*
  * This Class implements a BadSeller
@@ -44,5 +47,24 @@ public class BadSeller extends Seller
 		}
 		
 		return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
+	}
+
+	@Override
+	public void defineProductsSalesBehavior() 
+	{
+		for(Product product : productsForSale)
+		{
+			try 
+			{
+				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.TOTAL_RESQUESTS));
+			} 
+			catch (Exception e) 
+			{
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}	
 	}
 }

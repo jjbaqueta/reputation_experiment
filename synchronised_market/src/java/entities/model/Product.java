@@ -16,15 +16,13 @@ public class Product
 	private Behavior salesBehaviorPrice;
 	private Behavior salesBehaviorQuality;
 	private Behavior salesBehaviorDelivery;
-	
+
 	public Product(String name, Double price, Double quality, Integer deliveryTime) 
 	{
-		this.name = name;
+		this.name = name.toUpperCase();
 		this.price = price;
 		this.quality = quality;
 		this.deliveryTime = deliveryTime;
-		
-		// select behavior in this part
 	}
 
 	public String getName() 
@@ -103,5 +101,30 @@ public class Product
 	{
 		return "Product [name=" + name + ", price=" + price + ", quality=" + quality + ", deliveryTime=" + deliveryTime
 				+ "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
 }

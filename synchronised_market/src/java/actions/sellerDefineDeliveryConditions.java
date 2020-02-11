@@ -8,6 +8,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
@@ -44,6 +45,12 @@ public class sellerDefineDeliveryConditions extends DefaultInternalAction
 			
 			// Computing new contract conditions
 			Offer newContract = seller.computeContractConditions(offer);
+			
+			if(newContract == null)
+			{
+				System.out.println("PRODUCT DOESN'T HAVE SALES BEHAVIOR : PRODUCT - " + offer.getProduct());
+				return un.unifies(Literal.parseLiteral("none"), args[4]);	
+			}
 			
 			// Computing discounts
 			NumberTerm loyalty = (NumberTerm) args[3];
