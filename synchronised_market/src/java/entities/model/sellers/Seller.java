@@ -2,13 +2,13 @@ package entities.model.sellers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import entities.model.Offer;
 import entities.model.Product;
 import entities.model.SimpleAgent;
+import entities.model.behaviors.Behavior;
 import entities.services.ProductsFacade;
 import jason.asSyntax.Literal;
 
@@ -17,29 +17,6 @@ public abstract class Seller extends SimpleAgent
 	protected Set<Product> productsForSale;	// Items for sale
 	private int saleMadeCount;				// Number of sale that were performed
 	private int saleLostCount;				// Number of sale that were lost
-	
-	/*
-	 * This constructor initializes the list of products sold by seller
-	 * @param name Seller's name
-	 * @param amountOfItems Integer value that represents the number of products that the seller can sell
-	 * @param availableProducts List of Products available to sell
-	 */
-	public Seller(String name, int amountOfItems, List<Product> availableProducts) 
-	{
-		super.setName(name);
-		productsForSale = ProductsFacade.getSubsetFrom(amountOfItems, availableProducts);
-		saleMadeCount = 0;
-		saleLostCount = 0;
-		
-		// A seller may define his own sell conditions, up to 20% the more than products original conditions
-		Random rand = new Random();
-		double priceFactor = 0.2 * rand.nextDouble();
-		double qualityFactor = 0.2 * rand.nextDouble();
-		double deliveryFactor = 0.2 * rand.nextDouble();
-		
-		defineProductsSalesBehavior();
-		setMySellConditions(priceFactor, qualityFactor, deliveryFactor);
-	}
 	
 	/*
 	 * This constructor initializes the list of products sold by seller
@@ -57,8 +34,8 @@ public abstract class Seller extends SimpleAgent
 		saleMadeCount = 0;
 		saleLostCount = 0;
 		
-		defineProductsSalesBehavior();
 		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
+		defineProductsSalesBehavior();	
 	}
 	
 	public abstract void defineProductsSalesBehavior();
@@ -70,7 +47,25 @@ public abstract class Seller extends SimpleAgent
 	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
 	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
 	 */
-	public abstract Offer computeContractConditions(Offer agreedOffer);
+	public Offer computeContractConditions(Offer agreedOffer) 
+	{
+		Product product = getProductFromName(agreedOffer.getProduct());
+		
+		if(product != null)
+		{
+			Behavior pBehavior = product.getSalesBehaviorPrice();
+			Behavior qBehavior = product.getSalesBehaviorQuality();
+			Behavior dBehavior = product.getSalesBehaviorDelivery();
+			
+			double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+			double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
+			double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+			
+			return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
+		}
+		
+		return null;
+	}
 	
 	/*
 	 * This method is used by seller to change the products attributes according to his own sell conditions
@@ -80,6 +75,7 @@ public abstract class Seller extends SimpleAgent
 	 */
 	private void setMySellConditions(double priceFactor, double qualityFactor, double deliveryFactor)
 	{
+		System.out.println(priceFactor);
 		for(Product product : productsForSale)
 		{
 			product.setPrice(product.getPrice() * (1 + priceFactor));							//increase price

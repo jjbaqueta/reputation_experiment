@@ -1,5 +1,8 @@
 package actions;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +38,8 @@ public class buyerFindBestOffer extends DefaultInternalAction
 	private final double REP_CUT_SCORE = 0.8;
 	private final double IMG_CUT_SCORE = 0.6;
 	
+	private String buyerName;
+	
 	/*
 	 * This method is used by buyer to decide what is the best offer among all offers sent to him 
 	 * From the reputation and preferences informations the buyer is able to decide which offer accepts or rejects
@@ -57,6 +62,7 @@ public class buyerFindBestOffer extends DefaultInternalAction
 			 * ************************************
 			 */
 			
+			buyerName = args[0].toString();
 			int index = MarketFacade.getBuyerIdFrom(args[0].toString());
 			Buyer buyer = Market.buyers[index];
 			
@@ -217,8 +223,34 @@ public class buyerFindBestOffer extends DefaultInternalAction
 				double qImage = Util.convertToNormalizedInterval(ratting[1]);
 				double dImage = Util.convertToNormalizedInterval(ratting[2]);
 				
+				writeImgStatus(offer.getSeller().getName(), pImage, qImage, dImage);
+				
 				offer.setAcceptByImage(Util.isAcceptableScore(IMG_CUT_SCORE, pImage, qImage, dImage, priceWeight, qualityWeight, deliveryWeight));	
 			}
+		}
+	}
+	
+	/*
+	 * This method writes in the output file 'sales.txt' the current sale state of each seller
+	 * @param seller represents the seller who will be write his sale state
+	 * @param time current time, it is used to sort the writing events
+	 * 
+	 * "image(seller,product_name,time,[price,quality,delivery])"
+	 */
+	public void writeImgStatus(String sellerName, double pScore, double qScore, double dScore)
+	{
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(Market.fileImg, true));
+			writer.append(buyerName + ";" +
+						  sellerName + ";" + 
+						  System.currentTimeMillis() + ";" + 
+						  pScore + ";" +
+						  qScore + ";" +
+						  dScore + "\n");			     
+		    writer.close();
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

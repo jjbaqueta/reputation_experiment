@@ -4,8 +4,8 @@ import java.util.List;
 
 import entities.model.Product;
 import entities.model.sellers.BadSeller;
+import entities.model.sellers.GeneralSeller;
 import entities.model.sellers.GoodSeller;
-import entities.model.sellers.NeutralSeller;
 import entities.model.sellers.Seller;
 import enums.SellerType;
 
@@ -23,18 +23,18 @@ public class SellerFactory
 	 * @param availableProducts List of Products available to sell
 	 * @return A Seller
 	 */
-	public static Seller getSeller(SellerType type, String name, int amountOfItems, List<Product> availableProducts) throws Exception
+	public static Seller getSeller(SellerType type, String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> availableProducts) throws Exception
 	{
 		switch(type) 
 		{
 			case BAD:
-				return new BadSeller(name, amountOfItems, availableProducts);
+				return new BadSeller(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
 				
-			case NEUTRAL:
-				return new NeutralSeller(name, amountOfItems, availableProducts);
+			case GENERAL:
+				return new GeneralSeller(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
 				
 			case GOOD:
-				return new GoodSeller(name, amountOfItems, availableProducts);
+				return new GoodSeller(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
 				
 			default:
 				throw new Exception("Seller's type is not allowed");

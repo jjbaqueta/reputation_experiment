@@ -11,14 +11,11 @@ import java.util.logging.Logger;
 import entities.model.Product;
 import entities.model.buyers.Buyer;
 import entities.model.buyers.GeneralOrientedBuyer;
-import entities.model.sellers.GeneralSeller;
 import entities.model.sellers.Seller;
-import entities.services.BehaviorFactory;
 import entities.services.BuyerFactory;
 import entities.services.MarketFacade;
 import entities.services.ProductsFacade;
 import entities.services.SellerFactory;
-import enums.BehaviorPattern;
 import enums.BuyerType;
 import enums.CriteriaType;
 import enums.SellerType;
@@ -44,17 +41,16 @@ public class Market extends Environment
 //	private static final int ORDERS_BY_BUYER = 5;
 	
 	
-	private static final int BAD_SELLERS = 0;
-	private static final int GOOD_SELLERS = 0;
-	private static final int NEUTRAL_SELLERS = 0;
+	private static final int BAD_SELLERS = 1;
+	private static final int GOOD_SELLERS = 1;
 	private static final int GENERAL_SELLERS = 1;
-	private static final int ITEMS_SOLD_BY_SELLER = 4;	//at most 25
+	private static final int ITEMS_SOLD_BY_SELLER = 25;	//at most 25
 
-	private static final int PRICE_BUYERS = 1;
-	private static final int QUALITY_BUYERS = 0;
-	private static final int DELIVERY_BUYERS = 0;
-	private static final int GENERAL_BUYERS = 0;
-	private static final int ORDERS_BY_BUYER = 3;
+	private static final int PRICE_BUYERS = 2;
+	private static final int QUALITY_BUYERS = 1;
+	private static final int DELIVERY_BUYERS = 1;
+	private static final int GENERAL_BUYERS = 1;
+	private static final int ORDERS_BY_BUYER = 5;
 	
 	public static final int TOTAL_RESQUESTS = (PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER;
 
@@ -62,10 +58,11 @@ public class Market extends Environment
 	
 	public static File fileSales = new File("sale.txt");
 	public static File fileRep = new File("rep.txt");
+	public static File fileImg = new File("img.txt");
 	
 	/** Static attributes: */
 
-	public static Seller[] sellers = new Seller[BAD_SELLERS + NEUTRAL_SELLERS + GOOD_SELLERS + GENERAL_SELLERS];
+	public static Seller[] sellers = new Seller[BAD_SELLERS + GOOD_SELLERS + GENERAL_SELLERS];
 	public static Buyer[] buyers = new Buyer[PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS];
 
 	/** Class attributes: */
@@ -86,6 +83,9 @@ public class Market extends Environment
 			
 			if(fileRep.exists())
 				fileRep.delete();
+			
+			if(fileImg.exists())
+				fileImg.delete();
 
 			
 			// Defining the criteria used by model of reputation
@@ -94,9 +94,8 @@ public class Market extends Environment
 			ReputationModel.insertNewCriteria(CriteriaType.DELIVERY.getValue(), Integer.class);
 
 			// Creating a complete list of products
-//			availableProducts = ProductsFacade.generateCompleteListOfProducts();
+			availableProducts = ProductsFacade.generateCompleteListOfProducts();
 //			availableProducts = ProductsFacade.generateListOfTVs();
-			availableProducts = ProductsFacade.customListOfProducts(TOTAL_RESQUESTS);
 			
 			// Creating a logger to show messages
 			logger = Logger.getLogger("Log messages for Class: " + Market.class.getName());
@@ -112,51 +111,34 @@ public class Market extends Environment
 			int j = 0;
 
 			for (int i = 0; i < BAD_SELLERS; i++)
-				sellers[j++] = SellerFactory.getSeller(SellerType.BAD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
-
-			for (int i = 0; i < NEUTRAL_SELLERS; i++)
-				sellers[j++] = SellerFactory.getSeller(SellerType.NEUTRAL, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
+				sellers[j++] = SellerFactory.getSeller(SellerType.BAD, "seller" + j, ITEMS_SOLD_BY_SELLER, 0.5, 0.2, 0.2, availableProducts);
 
 			for (int i = 0; i < GOOD_SELLERS; i++)
-				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + j, ITEMS_SOLD_BY_SELLER, availableProducts);
+				sellers[j++] = SellerFactory.getSeller(SellerType.GOOD, "seller" + j, ITEMS_SOLD_BY_SELLER, 0.2, 0.0, 0.0, availableProducts);
 			
-			GeneralSeller s1 = new GeneralSeller("seller", ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+			for (int i = 0; i < GENERAL_SELLERS; i++)
+				sellers[j++] = SellerFactory.getSeller(SellerType.GENERAL, "seller" + j, ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
 			
-//			s1.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, TOTAL_RESQUESTS));
-//			s1.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
-//			s1.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
-			
-			sellers[j++] = s1;
-			
-			
-			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
-			
-//			GeneralSeller s1 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+//			/************************************
+//			 *  Creating a full customized seller
+//			 ************************************/
 //			
-//			s1.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, TOTAL_RESQUESTS));
-//			s1.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
-//			s1.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
+//			Seller s1 = SellerFactory.getSeller(SellerType.GENERAL, "seller" + j, ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
+//			Product[] s1Products =  (Product[]) s1.getProductsForSale().toArray();
+//			
+//			s1Products[0].setProductBehaviors(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS), 
+//											  BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS),
+//											  BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+//			
+//			s1Products[1].setProductBehaviors(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS), 
+//					  						  BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS),
+//					  						  BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+//			
+//			s1Products[2].setProductBehaviors(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS), 
+//					  						  BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS),
+//					  						  BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
 //			
 //			sellers[j++] = s1;
-			
-//			GeneralSeller s2 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
-//			
-//			s2.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_DEC_INC, TOTAL_RESQUESTS));
-//			s2.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.PARABLE_INC_DEC, TOTAL_RESQUESTS));
-//			s2.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, TOTAL_RESQUESTS));
-//			
-//			sellers[j++] = s2;
-//			
-//			// Initializing general sellers, in this case the initializations must be case to case due to the specificities of each seller
-//			
-//			GeneralSeller s3 = new GeneralSeller("seller" + (j + 1), ITEMS_SOLD_BY_SELLER, 0.0, 0.0, 0.0, availableProducts);
-//			
-//			s3.setPriceBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, TOTAL_RESQUESTS));
-//			s3.setQualityBehavior(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_INCREASING, TOTAL_RESQUESTS));
-//			s3.setDeliveryBehavior(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, TOTAL_RESQUESTS));
-//			
-//			sellers[j++] = s3;
-
 
 			long time = System.currentTimeMillis();
 			
@@ -187,7 +169,7 @@ public class Market extends Environment
 
 			for (int i = 0; i < GENERAL_BUYERS; i++)
 				buyers[j++] = new GeneralOrientedBuyer("buyer" + j, rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), ORDERS_BY_BUYER, availableProducts);
-
+			
 			/** Case exist only one agent of each type: */
 
 			if (sellers.length == 1)

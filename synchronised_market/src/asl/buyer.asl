@@ -200,7 +200,7 @@ check_impressions(Ag, Impressions)
 /*
  * This plane updates the image of a given seller
  */	
-+!update_image(Seller, p(Name, _, _, _), imp(_,_, Time, Rating_list))
++!update_image(Seller, p(Name,_,_,_), imp(_,_, Time, Rating_list))
 	<- +image(Seller, Name, Time, Rating_list).
 
 /*

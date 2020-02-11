@@ -7,7 +7,7 @@ import jason.asSyntax.Literal;
  * This class implements a Product
  * The products are the base elements to negotiation between buyers and sellers 
  */
-public class Product 
+public class Product implements Cloneable
 {	
 	private String name;
 	private Double price;
@@ -90,10 +90,17 @@ public class Product
 	public void setSalesBehaviorDelivery(Behavior salesBehaviorDelivery) {
 		this.salesBehaviorDelivery = salesBehaviorDelivery;
 	}
+	
+	public void setProductBehaviors(Behavior priceBehavior, Behavior qualityBehavior, Behavior deliveryBehavior)
+	{
+		this.salesBehaviorPrice = priceBehavior;
+		this.salesBehaviorPrice = qualityBehavior;
+		this.salesBehaviorPrice = deliveryBehavior;
+	}
 
 	public Literal getProductAsLiteral()
 	{
-		return Literal.parseLiteral("p(" + name + "," + price + "," + quality + "," + deliveryTime + ")");
+		return Literal.parseLiteral("p(" + name.toLowerCase() + "," + price + "," + quality + "," + deliveryTime + ")");
 	}
 	
 	@Override
@@ -103,13 +110,13 @@ public class Product
 				+ "]";
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = 1;
+//		result = prime * result + ((name == null) ? 0 : name.hashCode());
+//		return result;
+//	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -127,4 +134,13 @@ public class Product
 			return false;
 		return true;
 	}
+	
+	public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Cloning not allowed.");
+            return this;
+        }
+    }
 }
