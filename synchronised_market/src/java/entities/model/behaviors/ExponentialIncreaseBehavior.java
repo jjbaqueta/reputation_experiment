@@ -17,7 +17,7 @@ public class ExponentialIncreaseBehavior extends Behavior
 	@Override
 	public double getbehaviorValueFor(int x) 
 	{
-		double y = Math.pow(1 + 1/controlFactor, x) - 1;	//y = f(x); f(x) = (1+1/cF)^x - 1;	
+		double y = -(controlFactor/2)*x + controlFactor;	//y = f(x); f(x) = -x + cF price * (1 + ()/controlFactor)
 		return checkInterval(y); 
 	}
 }

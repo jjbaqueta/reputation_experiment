@@ -27,7 +27,7 @@ public class GoodSeller extends Seller{
 		{
 			try 
 			{
-				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, Market.TOTAL_RESQUESTS));
 				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
 				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
 			} 

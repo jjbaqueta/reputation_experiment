@@ -8,6 +8,7 @@ import entities.model.Product;
 import entities.model.SimpleAgent;
 import entities.services.MarketFacade;
 import jason.asSyntax.Literal;
+import reputationModels.Image;
 
 public abstract class Buyer extends SimpleAgent
 {
@@ -27,6 +28,8 @@ public abstract class Buyer extends SimpleAgent
 	private int purchaseAbortedCount;
 	
 	private boolean buying;
+	
+	private Image image;
 	
 	/*
 	 * Constructor
@@ -151,6 +154,14 @@ public abstract class Buyer extends SimpleAgent
 	public void endActivities() 
 	{
 		this.buying = false;
+	}
+	
+	public Image getImage() {
+		return image;
+	}
+
+	public void setImage(Image image) {
+		this.image = image;
 	}
 
 	/*

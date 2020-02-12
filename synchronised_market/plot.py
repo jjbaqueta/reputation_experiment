@@ -19,11 +19,11 @@ times = defaultdict(list)
 
 for line in dataset:
     line = line.strip()
-    t1, t2, t3, t4 = line.split(',')    #t1: seller's name; t2: seller's type; t3: time of sale; t4: total of sales at time
+    t1, t2, t3, t4 = line.split(';')    #t1: seller's name; t2: seller's type; t3: time of sale; t4: total of sales at time
     
-    sellers[t1].append(t4)
+    sellers[t1].append(int(t4))
     types[t1].add(t2)
-    times[t1].append(t3)
+    times[t1].append(int(t3))
 
 for key in sellers.keys():    
     

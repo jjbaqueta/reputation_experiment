@@ -74,6 +74,10 @@ public class Reputation {
 		return rep;
 	}
 	
+	public void setTime(long time) {
+		this.time = time;
+	}
+
 	/*
 	 * This method convert an impression to a belief.
 	 * Each belief is defined as follow: imp(appraiser, appraised, time, [rating1, rating2, rating3, ...])

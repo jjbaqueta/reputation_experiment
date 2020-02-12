@@ -121,7 +121,7 @@ check_impressions(Ag, Impressions)
  * If the buyer has already a reputation stored about the seller, this reputation is updated
  * Every the a new reputation is computed, such a reputation is send to the respective seller
  */
-@cmpR1 +!compute_reputation([offer(Offer, Ag)|T])
++!compute_reputation([offer(Offer, Ag)|T])
 	:	check_impressions(Ag, Impressions) & Impressions \== []
 	<-	actions.buyerCalculateReputation(Impressions, Reputation_profile);
 		.send(Ag, tell, Reputation_profile);

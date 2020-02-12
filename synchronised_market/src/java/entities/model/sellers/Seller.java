@@ -1,6 +1,7 @@
 package entities.model.sellers;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -10,13 +11,18 @@ import entities.model.Product;
 import entities.model.SimpleAgent;
 import entities.model.behaviors.Behavior;
 import entities.services.ProductsFacade;
+import enums.CriteriaType;
+import environments.Market;
 import jason.asSyntax.Literal;
+import reputationModels.Reputation;
 
 public abstract class Seller extends SimpleAgent
 {
 	protected Set<Product> productsForSale;	// Items for sale
 	private int saleMadeCount;				// Number of sale that were performed
 	private int saleLostCount;				// Number of sale that were lost
+	
+	private List<Reputation> reputations;
 	
 	/*
 	 * This constructor initializes the list of products sold by seller
@@ -34,8 +40,46 @@ public abstract class Seller extends SimpleAgent
 		saleMadeCount = 0;
 		saleLostCount = 0;
 		
+		reputations = new ArrayList<Reputation>();
+		
+		Reputation reputation = new Reputation(this, 0);
+		reputation.setReputationRatings(CriteriaType.PRICE.getValue(), -1.0);
+		reputation.setReputationRatings(CriteriaType.QUALITY.getValue(), -1.0);
+		reputation.setReputationRatings(CriteriaType.DELIVERY.getValue(), -1.0);
+		reputation.setReliabilityRatings(CriteriaType.PRICE.getValue(), -1.0);
+		reputation.setReliabilityRatings(CriteriaType.QUALITY.getValue(), -1.0);
+		reputation.setReliabilityRatings(CriteriaType.DELIVERY.getValue(), -1.0);
+		reputations.add(reputation);
+		
 		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
 		defineProductsSalesBehavior();	
+	}
+	
+	public Seller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin) 
+	{
+		super.setName(name);
+		productsForSale = new LinkedHashSet<Product>();
+		saleMadeCount = 0;
+		saleLostCount = 0;
+		
+		reputations = new ArrayList<Reputation>();
+		
+		Reputation reputation = new Reputation(this, 0);
+		reputation.setReputationRatings(CriteriaType.PRICE.getValue(), -1.0);
+		reputation.setReputationRatings(CriteriaType.QUALITY.getValue(), -1.0);
+		reputation.setReputationRatings(CriteriaType.DELIVERY.getValue(), -1.0);
+		reputation.setReliabilityRatings(CriteriaType.PRICE.getValue(), -1.0);
+		reputation.setReliabilityRatings(CriteriaType.QUALITY.getValue(), -1.0);
+		reputation.setReliabilityRatings(CriteriaType.DELIVERY.getValue(), -1.0);
+		reputations.add(reputation);
+		
+		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
+		defineProductsSalesBehavior();	
+	}
+	
+	public void sell(Product product)
+	{
+		productsForSale.add(product);
 	}
 	
 	public abstract void defineProductsSalesBehavior();
@@ -57,9 +101,9 @@ public abstract class Seller extends SimpleAgent
 			Behavior qBehavior = product.getSalesBehaviorQuality();
 			Behavior dBehavior = product.getSalesBehaviorDelivery();
 			
-			double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-			double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(agreedOffer.getCnpid()));
-			double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(agreedOffer.getCnpid())));
+			double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(Market.TOTAL_RESQUESTS - agreedOffer.getCnpid()));
+			double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(Market.TOTAL_RESQUESTS - agreedOffer.getCnpid()));
+			double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(Market.TOTAL_RESQUESTS - agreedOffer.getCnpid())));
 			
 			return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
 		}
@@ -132,6 +176,14 @@ public abstract class Seller extends SimpleAgent
 	public void increaseSaleLost() 
 	{
 		this.saleLostCount++;
+	}
+
+	public List<Reputation> getReputations() {
+		return reputations;
+	}
+
+	public void addRep(Reputation reputation) {
+		reputations.add(reputation);
 	}
 
 	@Override

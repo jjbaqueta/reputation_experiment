@@ -154,7 +154,8 @@ public class buyerFindBestOffer extends DefaultInternalAction
 		if(!images.isEmpty())
 			filterByImage(offers, images, priceWeight, qualityWeight, deliveryWeight);
 		
-		offers.removeIf(offer -> offer.isAcceptByReputation() == false && offer.isAcceptByImage() == false);
+//		offers.removeIf(offer -> offer.isAcceptByReputation() == false && offer.isAcceptByImage() == false);
+//		offers.removeIf(offer -> offer.isAcceptByReputation() == false);
 		
 		// If there are not offers (all seller were removed due to their low reputation)
 		if(offers.isEmpty())

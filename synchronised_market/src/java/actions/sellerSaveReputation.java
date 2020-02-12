@@ -1,10 +1,6 @@
 package actions;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import enums.CriteriaType;
+import entities.services.MarketFacade;
 import environments.Market;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
@@ -31,7 +27,10 @@ public class sellerSaveReputation extends DefaultInternalAction
 		{	
 			// Parsing the received reputation
 			Reputation rep = Reputation.parseReputation(args[0].toString());
-			writeRepStatus(rep);
+			
+			// Updating reputation of the agent in model
+			int sellerId = MarketFacade.getSellerIdFrom(rep.getAgent().getName());
+			Market.sellers[sellerId].addRep(rep);
 			
 			//Returns the result as Term
 			return un.unifies(Literal.parseLiteral("none"), args[1]);		
@@ -43,30 +42,6 @@ public class sellerSaveReputation extends DefaultInternalAction
 		catch(Exception e)
 		{
 			throw new JasonException(e.getMessage());
-		}
-	}
-	
-	/*
-	 * This method writes in the output file 'sales.txt' the current sale state of each seller
-	 * @param seller represents the seller who will be write his sale state
-	 * @param time current time, it is used to sort the writing events
-	 */
-	public void writeRepStatus(Reputation rep)
-	{
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(Market.fileRep, true));
-			writer.append(rep.getAgent().getName() + ";" + 
-						  rep.getTime() + ";" + 
-						  rep.getReputationRatings().get(CriteriaType.PRICE.getValue()) + ";" +
-					      rep.getReputationRatings().get(CriteriaType.QUALITY.getValue()) + ";" +
-					      rep.getReputationRatings().get(CriteriaType.DELIVERY.getValue()) + ";" +
-					      rep.getReliabilityRatings().get(CriteriaType.PRICE.getValue()) + ";" +
-					      rep.getReliabilityRatings().get(CriteriaType.QUALITY.getValue()) + ";" +
-					      rep.getReliabilityRatings().get(CriteriaType.DELIVERY.getValue()) + "\n");			     
-		    writer.close();
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 }

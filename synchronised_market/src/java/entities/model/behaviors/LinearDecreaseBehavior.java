@@ -17,7 +17,7 @@ public class LinearDecreaseBehavior extends Behavior
 	@Override
 	public double getbehaviorValueFor(int x) 
 	{
-		double y = -x + controlFactor;	//y = f(x); f(x) = -x + cF;	
+		double y = x;			//y = f(x); f(x) = x;
 		return checkInterval(y); 
 	}
 }

@@ -31,6 +31,11 @@ public abstract class MarketFacade
 		return Literal.parseLiteral("buy("+ seqId.getAndIncrement() + "," + p.getName().toLowerCase() + ")");
 	}
 	
+	public static Literal buy(Product product) 
+	{
+		return Literal.parseLiteral("buy("+ seqId.getAndIncrement() + "," + product.getName().toLowerCase() + ")");
+	}
+	
 	/*
 	 * This method shows all information about sellers and buyers including their products for sale and to buying, respectively
 	 */

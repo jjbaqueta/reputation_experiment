@@ -22,6 +22,7 @@ import enums.SellerType;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
+import reputationModels.Reputation;
 import reputationModels.ReputationModel;
 
 public class Market extends Environment 
@@ -41,15 +42,15 @@ public class Market extends Environment
 //	private static final int ORDERS_BY_BUYER = 5;
 	
 	
-	private static final int BAD_SELLERS = 1;
+	private static final int BAD_SELLERS = 0;
 	private static final int GOOD_SELLERS = 1;
-	private static final int GENERAL_SELLERS = 1;
+	private static final int GENERAL_SELLERS = 0;
 	private static final int ITEMS_SOLD_BY_SELLER = 25;	//at most 25
 
-	private static final int PRICE_BUYERS = 2;
-	private static final int QUALITY_BUYERS = 1;
-	private static final int DELIVERY_BUYERS = 1;
-	private static final int GENERAL_BUYERS = 1;
+	private static final int PRICE_BUYERS = 1;
+	private static final int QUALITY_BUYERS = 0;
+	private static final int DELIVERY_BUYERS = 0;
+	private static final int GENERAL_BUYERS = 0;
 	private static final int ORDERS_BY_BUYER = 5;
 	
 	public static final int TOTAL_RESQUESTS = (PRICE_BUYERS + QUALITY_BUYERS + DELIVERY_BUYERS + GENERAL_BUYERS) * ORDERS_BY_BUYER;
@@ -94,8 +95,8 @@ public class Market extends Environment
 			ReputationModel.insertNewCriteria(CriteriaType.DELIVERY.getValue(), Integer.class);
 
 			// Creating a complete list of products
-			availableProducts = ProductsFacade.generateCompleteListOfProducts();
-//			availableProducts = ProductsFacade.generateListOfTVs();
+//			availableProducts = ProductsFacade.generateCompleteListOfProducts();
+			availableProducts = ProductsFacade.generateListOfTVs();
 			
 			// Creating a logger to show messages
 			logger = Logger.getLogger("Log messages for Class: " + Market.class.getName());
@@ -140,12 +141,6 @@ public class Market extends Environment
 //			
 //			sellers[j++] = s1;
 
-			long time = System.currentTimeMillis();
-			
-			// Writing in the output file the initial sale state of each seller
-			for(Seller seller : sellers)
-				writeSaleStatus(seller, time);
-
 			/** Initializing buyers: */
 			/*
 			 * Each buyer has his own shopping list, which is represented by a stack of perceptions about the products that will be purchased. 
@@ -176,7 +171,15 @@ public class Market extends Environment
 				sellers[0].setName("seller");
 
 			if (buyers.length == 1)
-				buyers[0].setName("buyer");		
+				buyers[0].setName("buyer");
+			
+			
+			// Writing in the output file the initial sale state of each seller
+			
+			long time = System.currentTimeMillis();
+			
+			for(Seller seller : sellers)
+				writeSaleStatus(seller, time);
 		} 
 		catch (Exception e) 
 		{
@@ -239,7 +242,10 @@ public class Market extends Environment
 		else if(action.equals(Literal.parseLiteral("check_status(end)")))
 		{
 			if(MarketFacade.isMarketEnd())
+			{
 				showFinalReport();
+				writeReputations();
+			}
 		}
 		else if(action.equals(Literal.parseLiteral("purchase(completed)")))
 		{
@@ -306,9 +312,73 @@ public class Market extends Environment
 	{
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(fileSales, true));
-			writer.append(seller.getName() + "," + seller.getMyType() + "," + time + "," + seller.getSaleMadeCount() +"\n");			     
+			writer.append(seller.getName() + ";" + seller.getMyType() + ";" + time + ";" + seller.getSaleMadeCount() +"\n");			     
 		    writer.close();
 		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	 * This method writes in the output file 'sales.txt' the current sale state of each seller
+	 * @param seller represents the seller who will be write his sale state
+	 * @param time current time, it is used to sort the writing events
+	 */
+	public void writeReputations()
+	{
+		try 
+		{		
+			BufferedWriter writer = new BufferedWriter(new FileWriter(Market.fileRep, true));
+			
+			int maxSize = 0;
+			long maxTime = 0;
+			
+			// Getting the size of the largest list
+			for(Seller seller : sellers)
+			{
+				int currentSize = seller.getReputations().size();
+				
+				if(maxSize < currentSize)
+				{
+					maxSize = currentSize;
+					maxTime = seller.getReputations().get(seller.getReputations().size() - 1).getTime();
+				}
+			}
+			
+			// Writing reputation in file
+			for(Seller seller : sellers)
+			{		
+				for(Reputation rep : seller.getReputations())
+				{
+					writer.append(rep.getAgent().getName() + ";" + 
+								  rep.getTime() + ";" + 
+								  rep.getReputationRatings().get(CriteriaType.PRICE.getValue()) + ";" +
+							      rep.getReputationRatings().get(CriteriaType.QUALITY.getValue()) + ";" +
+							      rep.getReputationRatings().get(CriteriaType.DELIVERY.getValue()) + ";" +
+							      rep.getReliabilityRatings().get(CriteriaType.PRICE.getValue()) + ";" +
+							      rep.getReliabilityRatings().get(CriteriaType.QUALITY.getValue()) + ";" +
+							      rep.getReliabilityRatings().get(CriteriaType.DELIVERY.getValue()) + "\n");
+				}
+				
+				if(seller.getReputations().size() < maxSize)
+				{
+					Reputation lastRep = seller.getReputations().get(seller.getReputations().size() - 1);
+						
+					writer.append(lastRep.getAgent().getName() + ";" + 
+								  maxTime + ";" + 
+								  lastRep.getReputationRatings().get(CriteriaType.PRICE.getValue()) + ";" +
+								  lastRep.getReputationRatings().get(CriteriaType.QUALITY.getValue()) + ";" +
+								  lastRep.getReputationRatings().get(CriteriaType.DELIVERY.getValue()) + ";" +
+								  lastRep.getReliabilityRatings().get(CriteriaType.PRICE.getValue()) + ";" +
+								  lastRep.getReliabilityRatings().get(CriteriaType.QUALITY.getValue()) + ";" +
+								  lastRep.getReliabilityRatings().get(CriteriaType.DELIVERY.getValue()) + "\n");
+				}
+			}
+		    writer.close();    
+		} 
+		catch (IOException e) 
+		{
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
