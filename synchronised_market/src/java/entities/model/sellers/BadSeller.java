@@ -15,9 +15,9 @@ import environments.Market;
 public class BadSeller extends Seller
 {
 	// Constructor
-	public BadSeller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> availableProducts) 
+	public BadSeller(String name, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> products) 
 	{
-		super(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
+		super(name, priceMargin, qualityMargin, deliveryMargin, products);
 	}
 
 	@Override
@@ -27,9 +27,9 @@ public class BadSeller extends Seller
 		{
 			try 
 			{
-				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.TOTAL_RESQUESTS));
-				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.TOTAL_RESQUESTS));
-				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, Market.numberBuyingRequest));
+				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, Market.numberBuyingRequest));
+				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.SEMICONSTANT, Market.numberBuyingRequest));
 			} 
 			catch (Exception e) 
 			{

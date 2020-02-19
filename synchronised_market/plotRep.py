@@ -49,7 +49,7 @@ for key in times.keys():
 for key in sellersPR.keys():
     rand = lambda: random.randint(0,255)
     color = '#%02X%02X%02X' % (rand(), rand(), 200)
-    plt.plot(times[key], sellersPR[key], color, label=key)
+    plt.plot(times[key], sellersPR[key], color='tab:blue', label=key)
 
 plt.yticks(np.arange(-1, 1.1, 0.1))
 #plt.xticks(np.arange(min(x), max(x)+1, 1.0))

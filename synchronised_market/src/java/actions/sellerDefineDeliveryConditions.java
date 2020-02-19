@@ -44,7 +44,9 @@ public class sellerDefineDeliveryConditions extends DefaultInternalAction
 			offer.setCnpid(Integer.parseInt(args[2].toString()));
 			
 			// Computing new contract conditions
-			Offer newContract = seller.computeContractConditions(offer);
+			Offer newContract = seller.recalculateContractConditions(offer.getProduct().getName(),
+																	 Market.numberBuyingRequest - 1,
+																	 offer.getCnpid());
 			
 			if(newContract == null)
 			{

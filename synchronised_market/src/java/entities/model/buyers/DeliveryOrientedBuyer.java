@@ -10,22 +10,17 @@ import entities.model.Product;
  */
 public class DeliveryOrientedBuyer extends Buyer
 {
-	// Constructor
-	public DeliveryOrientedBuyer(String name, int amountOfItems, List<Product> products) 
-	{
-		super(name, amountOfItems, products);
-		setMyPreferences();
-	}
-
-	/*
-	 * This method defines the buyer's preferences in relation to price, quality and delivery
-	 * The delivery time is defined as priority
+	/* 
+	 * Constructor
+	 * @param name String value that represents the buyer's name
+	 * @param products List of desired products
 	 */
-	@Override
-	public void setMyPreferences() 
+	public DeliveryOrientedBuyer(String name, List<Product> products) 
 	{
-		setPreferenceByPrice(0);
-		setPreferenceByQuality(0);
-		setPreferenceByDelivery(1);
+		super(name, products);
+		
+		this.preferenceByPrice = 0;
+		this.preferenceByQuality = 0;
+		this.preferenceByDelivery = 1;
 	}
 }

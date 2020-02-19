@@ -1,115 +1,76 @@
 package entities.model.sellers;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import entities.model.Offer;
 import entities.model.Product;
 import entities.model.SimpleAgent;
 import entities.model.behaviors.Behavior;
-import entities.services.ProductsFacade;
-import enums.CriteriaType;
-import environments.Market;
+import entities.services.ReputationFacade;
 import jason.asSyntax.Literal;
 import reputationModels.Reputation;
 
 public abstract class Seller extends SimpleAgent
 {
-	protected Set<Product> productsForSale;	// Items for sale
-	private int saleMadeCount;				// Number of sale that were performed
-	private int saleLostCount;				// Number of sale that were lost
+	protected List<Product> productsForSale;
+	protected List<Reputation> reputationsLog;
 	
-	private List<Reputation> reputations;
+	protected int saleMadeCount;					
+	protected int saleLostCount;
+	
+	
+	/* Constructors ****************************/
 	
 	/*
 	 * This constructor initializes the list of products sold by seller
 	 * @param name Seller's name
-	 * @param amountOfItems Integer value that represents the number of products that the seller can sell
 	 * @param priceMargin A double value that defines the maximum price variation
 	 * @param qualityMargin A double value that defines the maximum quality variation
 	 * @param deliveryMargin A double value that defines the maximum delivery time variation
-	 * @param availableProducts List of Products available to sell
+	 * @param products List of products available for sale
 	 */
-	public Seller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin,  List<Product> availableProducts) 
+	public Seller(String name, double priceMargin, double qualityMargin, double deliveryMargin,  List<Product> products) 
 	{
 		super.setName(name);
-		productsForSale = ProductsFacade.getNoRadomSubsetFrom(amountOfItems, availableProducts);
+		
+		reputationsLog = new ArrayList<Reputation>();
+		reputationsLog.add(ReputationFacade.generateMaxRepTuple(this, 0));
+		
 		saleMadeCount = 0;
 		saleLostCount = 0;
 		
-		reputations = new ArrayList<Reputation>();
-		
-		Reputation reputation = new Reputation(this, 0);
-		reputation.setReputationRatings(CriteriaType.PRICE.getValue(), -1.0);
-		reputation.setReputationRatings(CriteriaType.QUALITY.getValue(), -1.0);
-		reputation.setReputationRatings(CriteriaType.DELIVERY.getValue(), -1.0);
-		reputation.setReliabilityRatings(CriteriaType.PRICE.getValue(), -1.0);
-		reputation.setReliabilityRatings(CriteriaType.QUALITY.getValue(), -1.0);
-		reputation.setReliabilityRatings(CriteriaType.DELIVERY.getValue(), -1.0);
-		reputations.add(reputation);
-		
-		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
+		productsForSale = products;
+
+		defineProductsAttributes(priceMargin, qualityMargin, deliveryMargin);	
 		defineProductsSalesBehavior();	
 	}
 	
-	public Seller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin) 
-	{
-		super.setName(name);
-		productsForSale = new LinkedHashSet<Product>();
-		saleMadeCount = 0;
-		saleLostCount = 0;
-		
-		reputations = new ArrayList<Reputation>();
-		
-		Reputation reputation = new Reputation(this, 0);
-		reputation.setReputationRatings(CriteriaType.PRICE.getValue(), -1.0);
-		reputation.setReputationRatings(CriteriaType.QUALITY.getValue(), -1.0);
-		reputation.setReputationRatings(CriteriaType.DELIVERY.getValue(), -1.0);
-		reputation.setReliabilityRatings(CriteriaType.PRICE.getValue(), -1.0);
-		reputation.setReliabilityRatings(CriteriaType.QUALITY.getValue(), -1.0);
-		reputation.setReliabilityRatings(CriteriaType.DELIVERY.getValue(), -1.0);
-		reputations.add(reputation);
-		
-		setMySellConditions(priceMargin, qualityMargin, deliveryMargin);
-		defineProductsSalesBehavior();	
-	}
 	
-	public void sell(Product product)
-	{
-		productsForSale.add(product);
-	}
+	/* Getters ****************************/
+	
+	public List<Product> getProductsForSale() {return this.productsForSale;}
+	
+	public List<Reputation> getReputations() {return reputationsLog;}
+	
+	public int getSaleMadeCount() {return saleMadeCount;}
+
+	public int getSaleLostCount() {return saleLostCount;}
+
+	
+	/* Setters ****************************/
+	
+	public void increaseSaleMade() {this.saleMadeCount++;}
+	
+	public void increaseSaleLost() {this.saleLostCount++;}
+	
+	public void addReputationInLog(Reputation reputation) {reputationsLog.add(reputation);}
+	
+	
+	/* General methods **********************/
 	
 	public abstract void defineProductsSalesBehavior();
-	
-	/*
-	 * This method is an abstract method which must be implemented by all sellers that extend this class.
-	 * For more details about the types of sellers: @see{GoodSeller, NeutralSeller, BadSeller}
-	 * it is used to compute the price, quality and delivery penalties on a contracted service by a given buyer
-	 * @param agreedOffer initial contract's terms defined between a buyer and the seller during the proposal phase
-	 * @return a new contract in literal format with the real delivery conditions, which may or not be according to initial contract
-	 */
-	public Offer computeContractConditions(Offer agreedOffer) 
-	{
-		Product product = getProductFromName(agreedOffer.getProduct());
-		
-		if(product != null)
-		{
-			Behavior pBehavior = product.getSalesBehaviorPrice();
-			Behavior qBehavior = product.getSalesBehaviorQuality();
-			Behavior dBehavior = product.getSalesBehaviorDelivery();
-			
-			double realPrice = agreedOffer.getProduct().getPrice() * (1 + pBehavior.getbehaviorValueFor(Market.TOTAL_RESQUESTS - agreedOffer.getCnpid()));
-			double realQuality = agreedOffer.getProduct().getQuality() * (1 - qBehavior.getbehaviorValueFor(Market.TOTAL_RESQUESTS - agreedOffer.getCnpid()));
-			double realDeliveryTime = (int) (agreedOffer.getProduct().getDeliveryTime() * (1 + dBehavior.getbehaviorValueFor(Market.TOTAL_RESQUESTS - agreedOffer.getCnpid())));
-			
-			return (Offer) new Offer(agreedOffer.getProduct().getName(), realPrice, realQuality, (int) realDeliveryTime, agreedOffer.getSeller());
-		}
-		
-		return null;
-	}
 	
 	/*
 	 * This method is used by seller to change the products attributes according to his own sell conditions
@@ -117,15 +78,64 @@ public abstract class Seller extends SimpleAgent
 	 * @param priceQuality percentage of increase/decrease for the quality attribute
 	 * @param priceDelivery percentage of increase/decrease for the delivery time attribute
 	 */
-	private void setMySellConditions(double priceFactor, double qualityFactor, double deliveryFactor)
+	private void defineProductsAttributes(double priceFactor, double qualityFactor, double deliveryFactor)
 	{
-		System.out.println(priceFactor);
 		for(Product product : productsForSale)
 		{
 			product.setPrice(product.getPrice() * (1 + priceFactor));							//increase price
 			product.setQuality(product.getQuality() * (1 - qualityFactor));						//decrease quality
 			product.setDeliveryTime((int) (product.getDeliveryTime() * (1 + deliveryFactor)));	//increase delivery time
 		}
+	}
+	
+	/*
+	 * This method is an abstract method which must be implemented by all sellers that extend this class.
+	 * For more details about the types of sellers: @see{GoodSeller, NeutralSeller, BadSeller}
+	 * it is used to compute the price, quality and delivery penalties on a contracted service by a given buyer
+	 * @param productName Name of product
+	 * @param seriesSize Size of temporal series used to compute the sales behavior of product
+	 * @param seriesElement Instant of time within temporal series 
+	 * @return A new offer is product exist, otherwise null
+	 */
+	public Offer recalculateContractConditions(String productName, int seriesSize, long seriesElemet) 
+	{
+		Product product = searchProductByName(productName);
+		
+		if(product != null)
+		{		
+			Behavior pBehavior = product.getSalesBehaviorPrice();
+			Behavior qBehavior = product.getSalesBehaviorQuality();
+			Behavior dBehavior = product.getSalesBehaviorDelivery();
+			
+			double realPrice = product.getPrice() * 
+					(1 + pBehavior.getbehaviorValueFor((seriesSize - (int) seriesElemet) + 1));
+			
+			double realQuality = product.getQuality() * 
+					(1 - qBehavior.getbehaviorValueFor((seriesSize - (int) seriesElemet) + 1));
+			
+			int realDeliveryTime = (int) (product.getDeliveryTime() * 
+					(1 + dBehavior.getbehaviorValueFor((seriesSize - (int) seriesElemet) + 1)));
+			
+			return (Offer) new Offer(productName, realPrice, realQuality, realDeliveryTime, this);
+		}
+		
+		return null;
+	}
+	
+	/*
+	 * This method search a product by its name from the list of product for sale
+	 * @param productName name of product to be found
+	 * @return a reference to product if it exist, otherwise 0
+	 */
+	
+	public Product searchProductByName(String productName) 
+	{
+		for (Product product : productsForSale)
+		{	
+			if (product.getName().equals(productName))
+				return product;
+		}
+		return null;
 	}
 	
 	/*
@@ -138,52 +148,13 @@ public abstract class Seller extends SimpleAgent
 		List<Literal> saleList = new ArrayList<Literal>();
 		
 		for(Product product : productsForSale)
-			saleList.add(Literal.parseLiteral("sell("+product.getName().toLowerCase()+","+product.getPrice()+","+product.getQuality()+","+product.getDeliveryTime()+")"));
+			saleList.add(Literal.parseLiteral(
+					"sell("+product.getName().toLowerCase()+"," +
+							product.getPrice()+"," +
+							product.getQuality()+"," +
+							product.getDeliveryTime()+")"));
 		
 		return saleList;
-	}
-	
-	public Product getProductFromName(Product p) 
-	{
-		for (Product product : productsForSale)
-		{
-			if (product.equals(p))
-				return product;
-		}
-		return null;
-	}
-	
-	public Set<Product> getProductsForSale()
-	{
-		return this.productsForSale;
-	}
-	
-	public int getSaleMadeCount() 
-	{
-		return saleMadeCount;
-	}
-
-	public void increaseSaleMade() 
-	{
-		this.saleMadeCount++;
-	}
-
-	public int getSaleLostCount() 
-	{
-		return saleLostCount;
-	}
-
-	public void increaseSaleLost() 
-	{
-		this.saleLostCount++;
-	}
-
-	public List<Reputation> getReputations() {
-		return reputations;
-	}
-
-	public void addRep(Reputation reputation) {
-		reputations.add(reputation);
 	}
 
 	@Override

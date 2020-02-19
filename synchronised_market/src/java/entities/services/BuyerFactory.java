@@ -24,18 +24,18 @@ public class BuyerFactory
 	 * @param availableProducts List of Products available to sell
 	 * @return A Buyer
 	 */
-	public static Buyer getBuyer(BuyerType type, String name, int amountOfItems, List<Product> availableProducts) throws Exception
+	public static Buyer getBuyer(BuyerType type, String name, List<Product> products) throws Exception
 	{
 		switch(type)
 		{
 			case PRICE_ORIENTED:
-				return new PriceOrientedBuyer(name, amountOfItems, availableProducts);
+				return new PriceOrientedBuyer(name, products);
 				
 			case QUALITY_ORIENTED:
-				return new QualityOrientedBuyer(name, amountOfItems, availableProducts);
+				return new QualityOrientedBuyer(name, products);
 				
 			case DELIVERY_ORIENTED:
-				return new DeliveryOrientedBuyer(name, amountOfItems, availableProducts);
+				return new DeliveryOrientedBuyer(name, products);
 				
 			default:
 				throw new Exception("Buyer's type is not allowed");

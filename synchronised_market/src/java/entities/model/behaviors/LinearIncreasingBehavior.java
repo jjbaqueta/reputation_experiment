@@ -17,7 +17,7 @@ public class LinearIncreasingBehavior extends Behavior
 	@Override
 	public double getbehaviorValueFor(int x) 
 	{
-		double y = x;			//y = f(x); f(x) = x;
+		double y = 0.3 - (x/controlFactor);
 		return checkInterval(y); 
 	}
 

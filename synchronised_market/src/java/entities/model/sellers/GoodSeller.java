@@ -12,12 +12,12 @@ import environments.Market;
  * This kind of seller doesn't change the contract's conditions
  * See contract conditions implementation in: @see #computeContractConditions(Offer agreedOffer) 
  */
-public class GoodSeller extends Seller{
-	
+public class GoodSeller extends Seller
+{
 	// Constructor
-	public GoodSeller(String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> availableProducts) 
+	public GoodSeller(String name, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> products) 
 	{
-		super(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
+		super(name, priceMargin, qualityMargin, deliveryMargin, products);
 	}
 	
 	@Override
@@ -27,9 +27,9 @@ public class GoodSeller extends Seller{
 		{
 			try 
 			{
-				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, Market.TOTAL_RESQUESTS));
-				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
-				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.TOTAL_RESQUESTS));
+				product.setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.numberBuyingRequest));
+				product.setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.numberBuyingRequest));
+				product.setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.CONSTANT, Market.numberBuyingRequest));
 			} 
 			catch (Exception e) 
 			{

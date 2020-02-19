@@ -23,18 +23,18 @@ public class SellerFactory
 	 * @param availableProducts List of Products available to sell
 	 * @return A Seller
 	 */
-	public static Seller getSeller(SellerType type, String name, int amountOfItems, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> availableProducts) throws Exception
+	public static Seller getSeller(SellerType type, String name, double priceMargin, double qualityMargin, double deliveryMargin, List<Product> products) throws Exception
 	{
 		switch(type) 
 		{
 			case BAD:
-				return new BadSeller(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
+				return new BadSeller(name, priceMargin, qualityMargin, deliveryMargin, products);
 				
 			case GENERAL:
-				return new GeneralSeller(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
+				return new GeneralSeller(name, priceMargin, qualityMargin, deliveryMargin, products);
 				
 			case GOOD:
-				return new GoodSeller(name, amountOfItems, priceMargin, qualityMargin, deliveryMargin, availableProducts);
+				return new GoodSeller(name, priceMargin, qualityMargin, deliveryMargin, products);
 				
 			default:
 				throw new Exception("Seller's type is not allowed");

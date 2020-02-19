@@ -1,8 +1,5 @@
 package actions;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +11,8 @@ import entities.model.buyers.Buyer;
 import entities.model.sellers.Seller;
 import entities.services.MarketFacade;
 import enums.CriteriaType;
+import environments.Experiment;
+import environments.Files;
 import environments.Market;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
@@ -154,8 +153,14 @@ public class buyerFindBestOffer extends DefaultInternalAction
 		if(!images.isEmpty())
 			filterByImage(offers, images, priceWeight, qualityWeight, deliveryWeight);
 		
-//		offers.removeIf(offer -> offer.isAcceptByReputation() == false && offer.isAcceptByImage() == false);
-//		offers.removeIf(offer -> offer.isAcceptByReputation() == false);
+		if(Experiment.ReputationFilter && Experiment.ImageFilter)
+			offers.removeIf(offer -> offer.isAcceptByReputation() == false && offer.isAcceptByImage() == false);
+		
+		else if(!Experiment.ReputationFilter && Experiment.ImageFilter)
+			offers.removeIf(offer -> offer.isAcceptByImage() == false);
+		
+		else if(Experiment.ReputationFilter && !Experiment.ImageFilter)
+			offers.removeIf(offer -> offer.isAcceptByReputation() == false);
 		
 		// If there are not offers (all seller were removed due to their low reputation)
 		if(offers.isEmpty())
@@ -224,34 +229,10 @@ public class buyerFindBestOffer extends DefaultInternalAction
 				double qImage = Util.convertToNormalizedInterval(ratting[1]);
 				double dImage = Util.convertToNormalizedInterval(ratting[2]);
 				
-				writeImgStatus(offer.getSeller().getName(), pImage, qImage, dImage);
+				Files.writeImgStatus(buyerName, offer.getSeller().getName(), offer.getProduct().getName(), pImage, qImage, dImage);
 				
 				offer.setAcceptByImage(Util.isAcceptableScore(IMG_CUT_SCORE, pImage, qImage, dImage, priceWeight, qualityWeight, deliveryWeight));	
 			}
-		}
-	}
-	
-	/*
-	 * This method writes in the output file 'sales.txt' the current sale state of each seller
-	 * @param seller represents the seller who will be write his sale state
-	 * @param time current time, it is used to sort the writing events
-	 * 
-	 * "image(seller,product_name,time,[price,quality,delivery])"
-	 */
-	public void writeImgStatus(String sellerName, double pScore, double qScore, double dScore)
-	{
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(Market.fileImg, true));
-			writer.append(buyerName + ";" +
-						  sellerName + ";" + 
-						  System.currentTimeMillis() + ";" + 
-						  pScore + ";" +
-						  qScore + ";" +
-						  dScore + "\n");			     
-		    writer.close();
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 }

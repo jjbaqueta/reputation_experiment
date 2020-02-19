@@ -26,11 +26,11 @@ public class sellerSaveReputation extends DefaultInternalAction
 		try
 		{	
 			// Parsing the received reputation
-			Reputation rep = Reputation.parseReputation(args[0].toString());
+			Reputation reputation = Reputation.parseReputation(args[0].toString());
 			
 			// Updating reputation of the agent in model
-			int sellerId = MarketFacade.getSellerIdFrom(rep.getAgent().getName());
-			Market.sellers[sellerId].addRep(rep);
+			int sellerId = MarketFacade.getSellerIdFrom(reputation.getAgent().getName());
+			Market.sellers[sellerId].addReputationInLog(reputation);
 			
 			//Returns the result as Term
 			return un.unifies(Literal.parseLiteral("none"), args[1]);		

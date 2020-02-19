@@ -16,7 +16,7 @@ import jason.asSyntax.Literal;
  */
 public abstract class MarketFacade 
 {	
-    private static AtomicInteger seqId = new AtomicInteger();	//identity sellers and buyers of unique way
+    public static AtomicInteger seqId = new AtomicInteger();	//identity sellers and buyers of unique way
 	
 	/*
 	 * This method selects an item randomly from the available product list
@@ -34,39 +34,6 @@ public abstract class MarketFacade
 	public static Literal buy(Product product) 
 	{
 		return Literal.parseLiteral("buy("+ seqId.getAndIncrement() + "," + product.getName().toLowerCase() + ")");
-	}
-	
-	/*
-	 * This method shows all information about sellers and buyers including their products for sale and to buying, respectively
-	 */
-	public static void showBuyersAndSellersInformations()
-	{
-		System.out.println("\n--------------------- BUYERS --------------------\n");
-		
-		for(Buyer buyer : Market.buyers)
-		{
-			System.out.println("Buyer's name: " + buyer.getName());
-			System.out.println("Preferences: {" + "price: " + buyer.getPreferenceByPrice() + ", quality: " + buyer.getPreferenceByQuality() + ", delivery: " + buyer.getPreferenceByDelivery() + "}");
-			System.out.println("Orders list {format: buy(CNPId, product)}: ");
-			
-			for(Literal order: buyer.getProductsToBuy())
-				System.out.println("   -> " + order);
-
-			System.out.println("");
-		}
-		
-		System.out.println("\n--------------------- SELLERS --------------------\n");
-		
-		for(Seller seller : Market.sellers)
-		{
-			System.out.println("Seller's name: " + seller.getName());
-			System.out.println("List of products for sale: ");
-			
-			for(Product product: seller.getProductsForSale())
-				System.out.println("   -> " + product);
-
-			System.out.println("");
-		}
 	}
 	
 	/*

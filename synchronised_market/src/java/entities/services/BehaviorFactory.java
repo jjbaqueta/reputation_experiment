@@ -6,7 +6,6 @@ import entities.model.behaviors.ExponantialDecreaseBehavior;
 import entities.model.behaviors.ExponentialIncreaseBehavior;
 import entities.model.behaviors.LinearDecreaseBehavior;
 import entities.model.behaviors.LinearIncreasingBehavior;
-import entities.model.behaviors.ParableDecIncBehavior;
 import entities.model.behaviors.SemiConstantBehavior;
 import enums.BehaviorPattern;
 
@@ -33,12 +32,6 @@ public class BehaviorFactory {
 			
 			case EXPONENTIAL_DECREASING:
 				return new ExponantialDecreaseBehavior(controlFactor);
-			
-			case PARABLE_INC_DEC:
-				return new ParableDecIncBehavior(controlFactor);
-			
-			case PARABLE_DEC_INC:
-				return new ParableDecIncBehavior(controlFactor);
 			
 			default:
 				throw new Exception("Pattern is not valid!");

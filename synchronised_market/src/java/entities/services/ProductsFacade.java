@@ -1,10 +1,8 @@
 package entities.services;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import entities.model.Product;
 import enums.ProductClassType;
@@ -155,55 +153,22 @@ public abstract class ProductsFacade
 		
 		return products;
 	}
-	
-    /*
-     * This method generates a subset of products from available list of products 
-	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
-	 * @param availableProducts List of Products available to sell
-     * @return A set of products of size equals the amountOfItems parameter
-     */
-    public static Set<Product> getSubsetFrom(int amountOfItems, List<Product> availableProducts)
-    {	
-    	if(availableProducts.size() >= amountOfItems)
-    	{
-    		Set<Product> productsForSell = new LinkedHashSet<Product>();
-	    	
-	    	Random rand = new Random();
-	    	
-	    	while(amountOfItems > 0)
-	    	{
-	    		if(productsForSell.add(availableProducts.get(rand.nextInt(availableProducts.size()))))
-	    			amountOfItems--;
-	    	}	    		    	
-	    	return productsForSell;
-    	}
-    	else return null;
-    }
     
-	
-    /*
-     * This method generates a subset of products from available list of products (always picks the three last items from list)
-	 * @param amountOfItems Integer value that represents the number of products that the buyer wants buying
-	 * @param availableProducts List of Products available to sell
-     * @return A set of products of size equals the amountOfItems parameter
-     */
-    public static Set<Product> getNoRadomSubsetFrom(int amountOfItems, List<Product> availableProducts)
-    {	  		
-    	if(availableProducts.size() >= amountOfItems)
-    	{
-    		Set<Product> productsForSell = new LinkedHashSet<Product>();
-	    	
-	    	while(amountOfItems > 0)
-	    	{
-	    		Product p = availableProducts.get(amountOfItems - 1);
-	    		
-	    		if(productsForSell.add(new Product(p.getName(), p.getPrice(), p.getQuality(), p.getDeliveryTime())))
-	    			amountOfItems--;
-	    	}	    		    	
-	    	return productsForSell;
-    	}
-    	else return null;
-    }
+	public static List<Product> generateRamdomListOfProducts(int amountOfProducts) throws Exception
+	{
+		Random rand = new Random();
+		List<Product> products = new ArrayList<Product>();
+		List<Product> availableProducts = generateCompleteListOfProducts();
+		
+
+		if (amountOfProducts > 25)
+			amountOfProducts = 25;
+		
+		for(int i = 0; i < amountOfProducts; i++)
+			products.add(availableProducts.get(rand.nextInt(availableProducts.size())));
+		
+		return products;
+	}
     
 	/*
      * This method shows a list of products

@@ -15,8 +15,10 @@ public class SemiConstantBehavior extends Behavior{
 	 */
 	@Override
 	public double getbehaviorValueFor(int x) 
-	{
-		double y = -controlFactor/5 + x;	//y = f(x); f(x) = -cF/5 + x;	
+	{	
+//		System.out.println("...................f(" + x +") = " + (1 + (Math.log(x)/2)/controlFactor));
+		double y = (Math.log(x)/2)/controlFactor;
+		
 		return checkInterval(y); 
 	}
 }

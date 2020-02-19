@@ -26,11 +26,11 @@ public abstract class Behavior
 		if (y <= 0)	
 			return 0;
 		
-		else if (y >= controlFactor) 
+		else if (y >= 1) 
 			return 1.0;
 		
 		else 
-			return y / controlFactor; 
+			return y; 
 	}
 
 	@Override
