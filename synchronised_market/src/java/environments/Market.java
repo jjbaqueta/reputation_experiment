@@ -35,7 +35,9 @@ public class Market extends Environment
 			
 //			experiment.startExperiment1();
 			
-			experiment.startExperiment2();
+//			experiment.startExperiment2();
+			
+			experiment.startExperiment3();
 			
 			
 			experiment.showBuyersAndSellersInformations();

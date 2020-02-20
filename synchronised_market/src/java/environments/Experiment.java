@@ -196,28 +196,102 @@ public class Experiment
 		adjustingAgentsNames();
 	}
 	
-	public void startExperiment3()
+	public void startExperiment3() throws Exception
 	{
-		ReputationFilter = false;
-		ImageFilter = false;
+		ReputationFilter = true;
+		ImageFilter = true;
 		
-		numberBadSellers = 1;
-		numberGoodSellers= 1;
-		numberGeneralSellers = 1;
+		numberBadSellers = 0;
+		numberGoodSellers= 0;
+		numberGeneralSellers = 3;
 
-		numberPriceBuyers = 1;
-		numberQualityBuyers = 1;
-		numberDeliveryBuyers = 1;
-		numberGeneralBuyers = 1;
+		numberPriceBuyers = 0;
+		numberQualityBuyers = 0;
+		numberDeliveryBuyers = 0;
+		numberGeneralBuyers = 3;
 		
-		numberProductsBySeller = 5;
-		numberProductsByBuyer = 3;
+		numberProductsBySeller = 2;
+		numberProductsByBuyer = 10;
 		
 		Market.sellers = new Seller[numberBadSellers + numberGoodSellers + numberGeneralSellers];
 		Market.buyers = new Buyer[numberPriceBuyers + numberQualityBuyers + numberDeliveryBuyers + numberGeneralBuyers];
 		Market.numberBuyingRequest = (numberPriceBuyers + numberQualityBuyers + numberDeliveryBuyers + numberGeneralBuyers) * numberProductsByBuyer;
+
+		List<Product> buyerProducts1 = new ArrayList<Product>();
 		
-		// Implements experiment
+		buyerProducts1.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts1.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		
+		Market.buyers[0] = new GeneralOrientedBuyer("buyer1", 1, 1, 0, buyerProducts1);
+		
+		
+		List<Product> buyerProducts2 = new ArrayList<Product>();
+		
+		buyerProducts2.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
+		buyerProducts2.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
+		
+		Market.buyers[1] = new GeneralOrientedBuyer("buyer2", 1, 1, 0, buyerProducts2);
+		
+		List<Product> buyerProducts3 = new ArrayList<Product>();
+		
+		buyerProducts3.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		buyerProducts3.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.ECONOMY).build());
+		
+		Market.buyers[2] = new GeneralOrientedBuyer("buyer3", 1, 1, 0, buyerProducts3);
+		
+		List<Product> sellerProducts1 = new ArrayList<Product>();
+		
+		sellerProducts1.add(new ProductBuilder(ProductDefault.TV.name(), ProductClassType.LUXURIOUS).build());
+	
+		sellerProducts1.get(0).setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.numberBuyingRequest));
+		sellerProducts1.get(0).setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.numberBuyingRequest));
+		sellerProducts1.get(0).setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.numberBuyingRequest));
+		
+		Market.sellers[0] = SellerFactory.getSeller(SellerType.GENERAL, "seller1", 0, 0, 0, sellerProducts1);
+		
+		List<Product> sellerProducts2 = new ArrayList<Product>();
+		
+		sellerProducts2.add(new ProductBuilder(ProductDefault.NOTEBOOK.name(), ProductClassType.LUXURIOUS).build());
+	
+		sellerProducts2.get(0).setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, Market.numberBuyingRequest));
+		sellerProducts2.get(0).setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, Market.numberBuyingRequest));
+		sellerProducts2.get(0).setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.EXPONENTIAL_DECREASING, Market.numberBuyingRequest));
+			
+		Market.sellers[1] = SellerFactory.getSeller(SellerType.GENERAL, "seller2", 0, 0, 0, sellerProducts2);
+		
+		List<Product> sellerProducts3= new ArrayList<Product>();
+		
+		sellerProducts3.add(new ProductBuilder(ProductDefault.DESKTOP.name(), ProductClassType.LUXURIOUS).build());
+	
+		sellerProducts3.get(0).setSalesBehaviorPrice(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.numberBuyingRequest));
+		sellerProducts3.get(0).setSalesBehaviorQuality(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.numberBuyingRequest));
+		sellerProducts3.get(0).setSalesBehaviorDelivery(BehaviorFactory.getBehavior(BehaviorPattern.LINEAR_INCREASING, Market.numberBuyingRequest));
+	
+		Market.sellers[2] = SellerFactory.getSeller(SellerType.GENERAL, "seller3", 0, 0, 0, sellerProducts3);
 		
 		adjustingAgentsNames();
 	}
